@@ -1,9 +1,13 @@
 * {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
 }
+
+body {
+}
+
 canvas {
-    background: #eee;
-    display: block;
-    margin: 0 auto;
+  background: #eee;
+  display: block;
+  margin: 0 auto;
 }

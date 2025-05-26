@@ -1,0 +1,325 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #13151b;
+  color: #fff;
+  font-family: "Pretendard", "Arial", sans-serif;
+  min-height: 100vh;
+}
+#main-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 22, 30, 0.98);
+  z-index: 10;
+}
+
+#main-menu h1 {
+  color: #3df4fa;
+  font-size: 2.6rem;
+  margin-bottom: 46px;
+  text-align: center;
+  text-shadow: 0 0 14px #21f4fa;
+  font-weight: 900;
+  letter-spacing: 2.5px;
+}
+
+#main-menu ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  width: 340px; /* 버튼 컨테이너 폭 */
+  padding: 0;
+  margin: 0;
+}
+
+#main-menu ul li {
+  width: 100%;
+}
+
+#main-menu button {
+  width: 100%;
+  min-width: 260px;
+  max-width: 100%;
+  height: 68px;
+  font-size: 1.55rem;
+  background: #27caff;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #09d4ff33;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  margin: 0;
+  transition: background 0.19s, box-shadow 0.19s;
+  cursor: pointer;
+  display: block;
+}
+
+#main-menu button:hover {
+  background: #13b9ec;
+  box-shadow: 0 2px 12px #21f4fa66;
+}
+
+#difficulty-menu,
+#game-screen,
+#hall-of-fame,
+#register-score-modal,
+#game-over-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 22, 30, 0.98);
+  z-index: 10;
+}
+
+#difficulty-menu,
+#hall-of-fame {
+  background: rgba(20, 22, 30, 0.98);
+}
+
+#game-screen {
+  background: rgba(30, 32, 40, 0.96);
+}
+
+h1,
+h2,
+h3 {
+  margin: 20px 0 30px 0;
+  color: #3df4fa;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px #23b9e5;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  background: #32d1ff;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 18px 60px;
+  font-size: 1.4rem;
+  margin: 18px 0;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px #1b2b42ad;
+  font-weight: 700;
+}
+
+button:hover {
+  background: #13b9ec;
+}
+
+#timer,
+#score {
+  font-size: 1.4rem;
+  margin: 10px 14px 10px 0;
+  color: #f7d84a;
+  text-shadow: 0 0 8px #212;
+}
+
+canvas#game-canvas {
+  background: #20222b;
+  box-shadow: 0 0 28px #000d, 0 0 8px #3df4fa80 inset;
+  border-radius: 18px;
+  margin-top: 30px;
+  margin-bottom: 24px;
+}
+
+#hall-of-fame-table {
+  width: 360px;
+  border-collapse: collapse;
+  margin: 20px auto 32px auto;
+  background: #232847;
+  color: #fff;
+}
+#hall-of-fame-table th,
+#hall-of-fame-table td {
+  border: 1px solid #3df4fa55;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+#hall-of-fame-table th {
+  background: #273a5a;
+  color: #3df4fa;
+  font-weight: bold;
+}
+
+input#initials-input {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1.3rem;
+  text-align: center;
+  width: 140px;
+  margin-right: 10px;
+  background: #232847;
+  color: #fff;
+  box-shadow: 0 2px 8px #1b2b42ad;
+}
+
+#register-score-modal,
+#game-over-modal {
+  background: rgba(20, 22, 30, 0.99);
+  z-index: 20;
+  border-radius: 16px;
+}
+
+#register-score-modal h3 {
+  color: #f7d84a;
+  text-shadow: 0 0 6px #d9b302;
+}
+
+#btn-register-score,
+#btn-gameover-menu,
+#btn-hall-back,
+#btn-difficulty-back {
+  background: #ff68ba;
+  color: #fff;
+  font-weight: 800;
+  margin-top: 20px;
+}
+
+#btn-register-score:hover,
+#btn-gameover-menu:hover,
+#btn-hall-back:hover,
+#btn-difficulty-back:hover {
+  background: #f3237d;
+}
+
+@media (max-width: 900px) {
+  canvas#game-canvas {
+    max-width: 98%;
+    height: 50%;
+  }
+  #hall-of-fame-table {
+    width: 90%;
+  }
+}
+
+#life {
+  color: #ff6877;
+  font-weight: bold;
+  margin-left: 18px;
+  font-size: 1.3rem;
+  text-shadow: 0 0 8px #922;
+}
+
+/* 게임 설명 */
+#howtoplay-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 22, 30, 0.98);
+  z-index: 10;
+}
+
+#howtoplay-menu h2 {
+  color: #3df4fa;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-align: center;
+  text-shadow: 0 0 10px #21f4fa;
+}
+
+#howtoplay-menu div {
+  margin-bottom: 30px;
+  font-size: 1.25rem;
+  color: #fff;
+  background: rgba(40, 45, 60, 0.95);
+  border-radius: 14px;
+  padding: 26px 36px;
+  box-shadow: 0 2px 12px #20e4fa44;
+  text-align: center;
+  line-height: 1.8;
+}
+
+#btn-howtoplay-back {
+  width: 180px;
+  height: 52px;
+  font-size: 1.1rem;
+  background: #ff68ba;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  margin-top: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+#btn-howtoplay-back:hover {
+  background: #f3237d;
+}
+
+/* 게임 클리어 시 모달 */
+#game-clear-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(20, 22, 30, 0.98);
+  z-index: 30;
+  border-radius: 20px;
+}
+#game-clear-modal h2 {
+  color: #ffe062;
+  font-size: 2.1rem;
+  margin-bottom: 16px;
+  text-align: center;
+  text-shadow: 0 0 10px #fd0;
+}
+#clear-score-text {
+  color: #3df4fa;
+  font-size: 1.45rem;
+  margin-bottom: 8px;
+  font-weight: bold;
+  letter-spacing: 1.3px;
+}
+#btn-clear-yes,
+#btn-clear-no {
+  background: #ff68ba;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 40px;
+  font-size: 1.18rem;
+  margin: 0 14px 10px 14px;
+  transition: background 0.16s;
+  cursor: pointer;
+}
+#btn-clear-yes:hover,
+#btn-clear-no:hover {
+  background: #f3237d;
+}
