@@ -18,9 +18,9 @@ $("#btn-difficulty-back").click(function () {
 
 // 난이도별 게임 설정값 객체는 그대로 사용
 const GAME_LEVELS = {
-  1: { ballSpeed: 4, paddleWidth: 120, brickRows: 3, brickCols: 7, brickHp: 1 },
-  2: { ballSpeed: 6, paddleWidth: 90, brickRows: 4, brickCols: 9, brickHp: 2 },
-  3: { ballSpeed: 8, paddleWidth: 70, brickRows: 5, brickCols: 12, brickHp: 3 },
+  1: { ballSpeed: 2, paddleWidth: 150, brickRows: 3, brickCols: 7, brickHp: 1 },
+  2: { ballSpeed: 4, paddleWidth: 100, brickRows: 4, brickCols: 9, brickHp: 2 },
+  3: { ballSpeed: 6, paddleWidth: 70, brickRows: 5, brickCols: 12, brickHp: 3 },
 };
 
 // 게임 기능 구현
@@ -41,11 +41,11 @@ function startGame(level) {
   $("#game-screen > div").append(
     '<span id="lives">목숨: <b>' + lives + "</b></span>"
   );
-  initGame(config); // 여기서 게임 본체 세팅
+  initGame(config, level); // 여기서 게임 본체 세팅
   startTimer();
 }
 
-function initGame(config) {
+function initGame(config, level) {
   const canvas = document.getElementById("game-canvas");
   const ctx = canvas.getContext("2d");
 
@@ -55,6 +55,7 @@ function initGame(config) {
     height: 16,
     x: (canvas.width - config.paddleWidth) / 2,
     speed: 8,
+    borderRadius: 30,
   };
 
   let ball = {
@@ -102,7 +103,17 @@ function initGame(config) {
     // 벽돌 그리기
     for (let b of bricks) {
       if (b.hp > 0) {
-        ctx.fillStyle = "#ffad42";
+        switch (b.hp) {
+          case 1:
+            ctx.fillStyle = "white";
+            break;
+          case 2:
+            ctx.fillStyle = "green";
+            break;
+          case 3:
+            ctx.fillStyle = "skyblue";
+            break;
+        }
         ctx.fillRect(b.x, b.y, b.width, b.height);
       }
     }
@@ -113,7 +124,8 @@ function initGame(config) {
       paddle.x,
       canvas.height - paddle.height - 8,
       paddle.width,
-      paddle.height
+      paddle.height,
+      paddle.borderRadius
     );
 
     // 공
@@ -184,6 +196,17 @@ function initGame(config) {
         ball.y - ball.radius < b.y + b.height &&
         ball.y + ball.radius > b.y
       ) {
+        switch (b.hp) {
+          case 1:
+            ctx.fillStyle = "white";
+            break;
+          case 2:
+            ctx.fillStyle = "green";
+            break;
+          case 3:
+            ctx.fillStyle = "skyblue";
+            break;
+        }
         b.hp--;
         score += 100;
         ball.dy = -ball.dy;
@@ -192,27 +215,112 @@ function initGame(config) {
     }
 
     // 남은 벽돌이 없으면 클리어
+    // draw 함수 내부
+    // ...
+    // 남은 벽돌이 없으면 클리어
     if (bricks.every((b) => b.hp <= 0)) {
       cancelAnimationFrame(animId);
       clearInterval(timer);
-      const bonus = timeLeft * 150;
+      let bonus = 0;
+      switch (level) {
+        case 1:
+          bonus = timeLeft * 100;
+          break;
+        case 2:
+          bonus = timeLeft * 150;
+          break;
+        case 3:
+          bonus = timeLeft * 200;
+          break;
+      }
       score += bonus;
-
-      // 기존 showRegisterScoreModal();는 주석처리 또는 삭제
-      // showRegisterScoreModal();
-
-      // 게임 클리어 모달 띄우기
+      let clearTime = 300 - timeLeft;
+      let clearTimeMin = Math.floor(clearTime / 60);
+      let clearTimeSec = Math.floor(clearTime % 60);
+      let timeLeftMin = Math.floor(timeLeft / 60);
+      let timeLeftSec = Math.floor(timeLeft % 60);
+      let str =
+        "클리어 시간 : " +
+        clearTimeMin +
+        "분 " +
+        clearTimeSec +
+        "초" +
+        "<br>" +
+        "남은 시간 : " +
+        timeLeftMin +
+        "분 " +
+        timeLeftSec +
+        "초" +
+        "<br>" +
+        "최종 점수: " +
+        score +
+        "점";
       $("#game-clear-modal").show();
-      $("#clear-score-text").text("최종 점수: " + score + "점");
+      $("#clear-score-text").text(str);
       return;
     }
 
+    // draw 함수 마지막!
     animId = requestAnimationFrame(draw);
   }
 
   let animId = requestAnimationFrame(draw);
   window.animId = requestAnimationFrame(draw);
 }
+// ESC 키로 일시정지 메뉴 토글
+$(document).on("keydown", function (e) {
+  if (e.key === "Escape") {
+    // 게임화면이 보일 때만 일시정지 메뉴 띄우기
+    if (
+      $("#game-screen").is(":visible") &&
+      !$("#pause-menu-modal").is(":visible")
+    ) {
+      $("#pause-menu-modal").show();
+      if (window.animId) cancelAnimationFrame(window.animId);
+      if (timer) clearInterval(timer);
+    }
+    // ESC 누른 상태에서 다시 ESC 치면 일시정지 메뉴 닫고 게임 계속
+    else if ($("#pause-menu-modal").is(":visible")) {
+      $("#pause-menu-modal").hide();
+      // 게임 재개
+      if ($("#game-screen").is(":visible")) {
+        window.animId = requestAnimationFrame(() => {
+          // 마지막으로 실행된 initGame의 draw 함수(=게임 루프) 재실행
+          // 별도 상태관리(예: 마지막 draw 함수 저장) 필요시 수정
+        });
+        startTimer();
+      }
+    }
+  }
+});
+// 게임 설정 메뉴로 이동
+$("#btn-pause-option").click(function () {
+  $("#pause-menu-modal, #game-screen").hide();
+  $("#option-menu").show(); // 실제로 option-menu id의 메뉴가 있어야 합니다.
+});
+
+// 난이도 선택 메뉴로 이동
+$("#btn-pause-difficulty").click(function () {
+  $("#pause-menu-modal, #game-screen").hide();
+  $("#difficulty-menu").show();
+});
+
+$("#btn-option-back").click(function () {
+  $("#option-menu").hide();
+  $("#pause-menu-modal").show();
+});
+// 다시 게임으로 (Resume)
+$("#btn-pause-resume").click(function () {
+  $("#pause-menu-modal").hide();
+  // 게임 재개
+  if ($("#game-screen").is(":visible")) {
+    window.animId = requestAnimationFrame(() => {
+      // 마지막으로 실행된 initGame의 draw 함수(=게임 루프) 재실행
+      // 별도 상태관리(예: 마지막 draw 함수 저장) 필요시 수정
+    });
+    startTimer();
+  }
+});
 // 타이머 시작/갱신
 function startTimer() {
   $("#timer").text(formatTime(timeLeft));
