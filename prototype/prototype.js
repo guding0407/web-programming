@@ -16,6 +16,11 @@ $("#btn-difficulty-back").click(function () {
   $("#main-menu").show();
 });
 
+// 게임 시작 시 오디오 로드
+$(document).ready(function () {
+  loadSettings();
+});
+
 // 난이도별 게임 설정값 객체는 그대로 사용
 const GAME_LEVELS = {
   1: { ballSpeed: 4, paddleWidth: 120, brickRows: 3, brickCols: 7, brickHp: 1 },
@@ -25,17 +30,26 @@ const GAME_LEVELS = {
 
 // 게임 기능 구현
 // 전역 변수
-let x = 0;
 let score = 0;
 let timer = null;
 let timeLeft = 300; // 5분 = 300초
-let lives = 3; // 목숨
+let lives = 100; // 목숨
+let bgmAudio = new Audio("bgm.mp3");
+let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
+bgmAudio.volume = volume;
+bgmAudio.loop = true;
+let sfxEnabled = true;
+let itemEnabled = true;
+let isPaddleWidened = false;
+let paddleEffect = null; // 현재 적용 중인 아이템 이름
+let paddleEffectTimeout = null;
+let paddleWidenTimeout = null;
 
 function startGame(level) {
   const config = GAME_LEVELS[level];
   score = 0;
   timeLeft = 300;
-  lives = 3;
+  lives = 100;
   $("#difficulty-menu, #main-menu, #hall-of-fame").hide();
   $("#game-screen").show();
   $("#lives").remove(); // 이전 표시 제거
@@ -82,6 +96,22 @@ function initGame(config) {
     }
   }
 
+  // 아이템 객체 구조 정의
+  let items = []; // 화면 위에 떨어지는 아이템들을 담을 배열
+
+  // 아이템 생성 함수
+  function spawnItem(type, x, y) {
+    items.push({
+      type: type,
+      x: x,
+      y: y,
+      width: 24,
+      height: 24,
+      dy: 2,
+      active: true,
+    });
+  }
+
   // 키보드 입력
   let rightPressed = false,
     leftPressed = false;
@@ -109,13 +139,45 @@ function initGame(config) {
     }
 
     // 패들
-    ctx.fillStyle = "#0095DD";
+    if (paddleEffect === "paddle-widen") {
+      ctx.fillStyle = "#3df4fa";
+      ctx.shadowColor = "#3df4fa";
+      ctx.shadowBlur = 20;
+    } else if (paddleEffect === "ball-slow") {
+      ctx.fillStyle = "#88cffa";
+      ctx.shadowColor = "#88cffa";
+      ctx.shadowBlur = 16;
+    } else if (paddleEffect === "ball-fast") {
+      ctx.fillStyle = "#ff5a36";
+      ctx.shadowColor = "#ff5a36";
+      ctx.shadowBlur = 18;
+    } else if (paddleEffect === "reverse-control") {
+      ctx.fillStyle = "#f0f";
+      ctx.shadowColor = "#f0f";
+      ctx.shadowBlur = 16;
+    } else {
+      ctx.fillStyle = "#0095DD";
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+    }
+
     ctx.fillRect(
       paddle.x,
       canvas.height - paddle.height - 8,
       paddle.width,
       paddle.height
     );
+
+    if (paddleEffect) {
+      ctx.font = "bold 18px Pretendard, Arial";
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        getEffectLabel(paddleEffect),
+        paddle.x + paddle.width / 2,
+        canvas.height - paddle.height - 16
+      );
+    }
 
     // 공
     ctx.beginPath();
@@ -188,7 +250,53 @@ function initGame(config) {
         b.hp--;
         score += 100;
         ball.dy = -ball.dy;
+
+        if (itemEnabled && Math.random() < 0.2) {
+          spawnItem("paddle-widen", b.x + b.width / 2, b.y + b.height);
+        }
+
         break;
+      }
+    }
+
+    // 아이템 드로우 및 충돌 처리
+    for (let item of items) {
+      if (!item.active) continue;
+
+      // 아이템 이동
+      item.y += item.dy;
+
+      // 그리기
+      ctx.fillStyle = "#3df4fa";
+      ctx.fillRect(item.x, item.y, item.width, item.height);
+
+      // 패들과 충돌 감지
+      if (
+        item.y + item.height >= paddleY &&
+        item.x + item.width > paddle.x &&
+        item.x < paddle.x + paddle.width
+      ) {
+        item.active = false;
+
+        // 패들 확장 효과 적용
+        if (item.type === "paddle-widen") {
+          if (!isPaddleWidened) {
+            paddle.width *= 1.5;
+            isPaddleWidened = true;
+          }
+
+          if (paddleWidenTimeout) clearTimeout(paddleWidenTimeout);
+          paddleWidenTimeout = setTimeout(() => {
+            paddle.width = config.paddleWidth;
+            isPaddleWidened = false;
+          }, 15000);
+
+          paddleEffect = "paddle-widen";
+          if (paddleEffectTimeout) clearTimeout(paddleEffectTimeout);
+          paddleEffectTimeout = setTimeout(() => {
+            paddleEffect = null;
+          }, 15000);
+        }
       }
     }
 
@@ -238,6 +346,75 @@ function onBrickBroken() {
     showRegisterScoreModal(); // 이니셜 입력받기
   }
 }
+
+// 아이템 문구 코드
+function getEffectLabel(effect) {
+  switch (effect) {
+    case "paddle-widen":
+      return "패들 확장!";
+    case "ball-slow":
+      return "공 느려짐!";
+    case "ball-fast":
+      return "공 빨라짐!";
+    case "reverse-control":
+      return "조작 반전!";
+    default:
+      return "";
+  }
+}
+
+// 설정값 저장 및 반영 구현
+function loadSettings() {
+  const bgm = localStorage.getItem("setting_bgm");
+  const sfx = localStorage.getItem("setting_sfx");
+  const vol = parseInt(localStorage.getItem("setting_volume") || "100");
+  const item = localStorage.getItem("setting_item");
+
+  $("#volume-range").val(vol);
+  volume = vol / 100;
+  bgmAudio.volume = volume;
+
+  $("#bgm-toggle").prop("checked", bgm !== "false");
+  $("#sfx-toggle").prop("checked", sfx !== "false");
+  $("#item-toggle").prop("checked", item !== "false");
+
+  if (bgm !== "false") {
+    bgmAudio.play();
+  } else {
+    bgmAudio.pause();
+  }
+
+  sfxEnabled = sfx !== "false";
+  itemEnabled = item !== "false";
+}
+
+// 체크박스 이벤트 연결
+$("#bgm-toggle").change(function () {
+  const enabled = $(this).is(":checked");
+  localStorage.setItem("setting_bgm", enabled);
+  if (enabled) bgmAudio.play();
+  else bgmAudio.pause();
+});
+
+$("#sfx-toggle").change(function () {
+  const enabled = $(this).is(":checked");
+  localStorage.setItem("setting_sfx", enabled);
+  sfxEnabled = enabled;
+});
+
+$("#item-toggle").change(function () {
+  const enabled = $(this).is(":checked");
+  localStorage.setItem("setting_item", enabled);
+  itemEnabled = enabled;
+});
+
+// 음향 조절 슬라이더 이벤트로 볼륨 반영
+$("#volume-range").on("input", function () {
+  const vol = parseInt($(this).val()) / 100;
+  localStorage.setItem("setting_volume", Math.floor(vol * 100));
+  volume = vol;
+  bgmAudio.volume = volume;
+});
 
 // 게임 클리어 시 명예의 전당에 등록하지 않을 때
 $("#btn-clear-no").click(function () {
@@ -298,6 +475,18 @@ $("#btn-gameover-menu, #btn-hall-back").click(function () {
   // 게임 루프, 타이머 강제 종료
   if (window.animId) cancelAnimationFrame(window.animId);
   if (timer) clearInterval(timer);
+});
+
+// 게임 설정 버튼 동작 추가
+$("#btn-option").click(function () {
+  $("#main-menu").hide();
+  $("#option-menu").show();
+});
+
+// 뒤로가기 버튼 처리
+$("#btn-option-back").click(function () {
+  $("#option-menu").hide();
+  $("#main-menu").show();
 });
 
 // 게임 설명

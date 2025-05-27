@@ -86,6 +86,35 @@
       <button id="btn-clear-yes">예</button>
       <button id="btn-clear-no">아니오</button>
     </div>
+    <!-- 게임 설정 메뉴 UI-->
+    <div id="option-menu" style="display: none">
+      <h2>게임 설정</h2>
+      <label style="margin: 12px 0">
+        <input type="checkbox" id="bgm-toggle" checked />
+        배경음 사용
+      </label>
+      <label style="margin: 12px 0">
+        <input type="checkbox" id="sfx-toggle" checked />
+        효과음 사용
+      </label>
+      <label>
+        <input type="checkbox" id="item-toggle" checked />
+        아이템 사용
+      </label>
+      <label style="margin: 12px 0">
+        볼륨:
+        <input
+          type="range"
+          id="volume-range"
+          min="0"
+          max="100"
+          value="100"
+          style="vertical-align: middle; margin-left: 8px"
+        />
+      </label>
+      <button id="btn-option-back">뒤로가기</button>
+    </div>
+
     <script src="prototype.js"></script>
   </body>
 </html>
