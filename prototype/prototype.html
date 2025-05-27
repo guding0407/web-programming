@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cyber Brick Breaker</title>
+    <link rel="stylesheet" href="prototype.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <!-- 메인 메뉴 -->
+    <div id="main-menu">
+      <h1>Cyber Brick Breaker</h1>
+      <ul>
+        <li><button id="btn-scenario">시나리오 설명</button></li>
+        <li><button id="btn-start">게임 시작</button></li>
+        <li><button id="btn-option">게임 설정</button></li>
+        <li><button id="btn-hall">명예의 전당</button></li>
+        <li><button id="btn-howtoplay">게임 설명</button></li>
+      </ul>
+    </div>
+    <div id="howtoplay-menu" style="display: none">
+      <h2>게임 설명</h2>
+      <div>
+        <!-- 여기에 게임 조작, 목표, 점수, 목숨, 게임오버/클리어 조건 등을 설명하면 됩니다 -->
+        <p>
+          방향키로 패들을 움직여 공을 튕기며 벽돌을 모두 제거하세요.<br />
+          공이 바닥에 떨어지면 목숨이 줄어들며, 목숨이 0이 되면 게임
+          오버입니다.<br />
+          모든 벽돌을 제거하면 남은 시간에 따라 추가 점수를 얻고 명예의 전당에
+          등록할 수 있습니다.
+        </p>
+      </div>
+      <button id="btn-howtoplay-back">메뉴로</button>
+    </div>
+    <!-- 난이도 선택 -->
+    <div id="difficulty-menu" style="display: none">
+      <h2>난이도 선택</h2>
+      <button class="btn-difficulty" data-level="1">초급</button>
+      <button class="btn-difficulty" data-level="2">중급</button>
+      <button class="btn-difficulty" data-level="3">고급</button>
+      <button id="btn-difficulty-back">뒤로가기</button>
+    </div>
+    <!-- 게임 화면 -->
+    <div id="game-screen" style="display: none">
+      <div>
+        <span id="timer"></span>
+        <span id="score"></span>
+      </div>
+      <canvas id="game-canvas" width="800" height="600"></canvas>
+    </div>
+    <!-- 명예의 전당 -->
+    <div id="hall-of-fame" style="display: none">
+      <h2>명예의 전당</h2>
+      <table id="hall-of-fame-table">
+        <thead>
+          <tr>
+            <th>이니셜</th>
+            <th>점수</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="btn-hall-back">메뉴로</button>
+    </div>
+    <!-- 이니셜 입력 모달 (게임 클리어시) -->
+    <div id="register-score-modal" style="display: none">
+      <h3>축하합니다! 점수를 등록하세요.</h3>
+      <input
+        type="text"
+        id="initials-input"
+        maxlength="3"
+        placeholder="이니셜 (3글자)"
+      />
+      <button id="btn-register-score">등록</button>
+    </div>
+    <!-- 게임오버 모달 -->
+    <div id="game-over-modal" style="display: none">
+      <h2>GAME OVER</h2>
+      <button id="btn-gameover-menu">메뉴로</button>
+    </div>
+    <!-- 게임 클리어 축하 모달 -->
+    <div id="game-clear-modal" style="display: none">
+      <h2>축하합니다! 게임을 클리어하셨습니다!</h2>
+      <div id="clear-score-text"></div>
+      <div style="margin: 24px 0 12px 0">명예의 전당에 등록하시겠습니까?</div>
+      <button id="btn-clear-yes">예</button>
+      <button id="btn-clear-no">아니오</button>
+    </div>
+    <script src="prototype.js"></script>
+  </body>
+</html>
