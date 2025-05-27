@@ -23,9 +23,30 @@ $(document).ready(function () {
 
 // 난이도별 게임 설정값 객체는 그대로 사용
 const GAME_LEVELS = {
-  1: { ballSpeed: 4, paddleWidth: 120, brickRows: 3, brickCols: 7, brickHp: 1 },
-  2: { ballSpeed: 6, paddleWidth: 90, brickRows: 4, brickCols: 9, brickHp: 2 },
-  3: { ballSpeed: 8, paddleWidth: 70, brickRows: 5, brickCols: 12, brickHp: 3 },
+  1: {
+    ballSpeed: 2,
+    paddleWidth: 150,
+    brickRows: 3,
+    brickCols: 7,
+    brickHp: 1,
+    borderRadius: 8,
+  },
+  2: {
+    ballSpeed: 4,
+    paddleWidth: 100,
+    brickRows: 4,
+    brickCols: 9,
+    brickHp: 2,
+    borderRadius: 8,
+  },
+  3: {
+    ballSpeed: 6,
+    paddleWidth: 70,
+    brickRows: 5,
+    brickCols: 12,
+    brickHp: 3,
+    borderRadius: 8,
+  },
 };
 
 // 게임 기능 구현
@@ -56,11 +77,11 @@ function startGame(level) {
   $("#game-screen > div").append(
     '<span id="lives">목숨: <b>' + lives + "</b></span>"
   );
-  initGame(config); // 여기서 게임 본체 세팅
+  initGame(config, level); // 여기서 게임 본체 세팅
   startTimer();
 }
 
-function initGame(config) {
+function initGame(config, level) {
   const canvas = document.getElementById("game-canvas");
   const ctx = canvas.getContext("2d");
 
@@ -70,6 +91,7 @@ function initGame(config) {
     height: 16,
     x: (canvas.width - config.paddleWidth) / 2,
     speed: 8,
+    borderRadius: config.borderRadius,
   };
 
   let ball = {
@@ -133,7 +155,19 @@ function initGame(config) {
     // 벽돌 그리기
     for (let b of bricks) {
       if (b.hp > 0) {
-        ctx.fillStyle = "#ffad42";
+        switch (b.hp) {
+          case 1:
+            ctx.fillStyle = "white";
+            break;
+          case 2:
+            ctx.fillStyle = "green";
+            break;
+          case 3:
+            ctx.fillStyle = "skyblue";
+            break;
+          default:
+            ctx.fillStyle = "#ffad42";
+        }
         ctx.fillRect(b.x, b.y, b.width, b.height);
       }
     }
@@ -161,12 +195,25 @@ function initGame(config) {
       ctx.shadowBlur = 0;
     }
 
-    ctx.fillRect(
-      paddle.x,
-      canvas.height - paddle.height - 8,
-      paddle.width,
-      paddle.height
-    );
+    // 패들 둥근 모서리 그리기
+    const px = paddle.x;
+    const py = canvas.height - paddle.height - 8;
+    const pr = paddle.borderRadius;
+    const pw = paddle.width;
+    const ph = paddle.height;
+
+    ctx.beginPath();
+    ctx.moveTo(px + pr, py);
+    ctx.lineTo(px + pw - pr, py);
+    ctx.quadraticCurveTo(px + pw, py, px + pw, py + pr);
+    ctx.lineTo(px + pw, py + ph - pr);
+    ctx.quadraticCurveTo(px + pw, py + ph, px + pw - pr, py + ph);
+    ctx.lineTo(px + pr, py + ph);
+    ctx.quadraticCurveTo(px, py + ph, px, py + ph - pr);
+    ctx.lineTo(px, py + pr);
+    ctx.quadraticCurveTo(px, py, px + pr, py);
+    ctx.closePath();
+    ctx.fill();
 
     if (paddleEffect) {
       ctx.font = "bold 18px Pretendard, Arial";
@@ -247,6 +294,17 @@ function initGame(config) {
         ball.y - ball.radius < b.y + b.height &&
         ball.y + ball.radius > b.y
       ) {
+        switch (b.hp) {
+          case 1:
+            ctx.fillStyle = "white";
+            break;
+          case 2:
+            ctx.fillStyle = "green";
+            break;
+          case 3:
+            ctx.fillStyle = "skyblue";
+            break;
+        }
         b.hp--;
         score += 100;
         ball.dy = -ball.dy;
@@ -304,12 +362,40 @@ function initGame(config) {
     if (bricks.every((b) => b.hp <= 0)) {
       cancelAnimationFrame(animId);
       clearInterval(timer);
-      const bonus = timeLeft * 150;
+      let bonus = 0;
+      switch (level) {
+        case 1:
+          bonus = timeLeft * 100;
+          break;
+        case 2:
+          bonus = timeLeft * 150;
+          break;
+        case 3:
+          bonus = timeLeft * 200;
+          break;
+      }
       score += bonus;
-
-      // 기존 showRegisterScoreModal();는 주석처리 또는 삭제
-      // showRegisterScoreModal();
-
+      let clearTime = 300 - timeLeft;
+      let clearTimeMin = Math.floor(clearTime / 60);
+      let clearTimeSec = Math.floor(clearTime % 60);
+      let timeLeftMin = Math.floor(timeLeft / 60);
+      let timeLeftSec = Math.floor(timeLeft % 60);
+      let str =
+        "클리어 시간 : " +
+        clearTimeMin +
+        "분 " +
+        clearTimeSec +
+        "초" +
+        "<br>" +
+        "남은 시간 : " +
+        timeLeftMin +
+        "분 " +
+        timeLeftSec +
+        "초" +
+        "<br>" +
+        "최종 점수: " +
+        score +
+        "점";
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
       $("#clear-score-text").text("최종 점수: " + score + "점");
@@ -320,7 +406,7 @@ function initGame(config) {
   }
 
   let animId = requestAnimationFrame(draw);
-  window.animId = requestAnimationFrame(draw);
+  window.animId = animId;
 }
 // 타이머 시작/갱신
 function startTimer() {
