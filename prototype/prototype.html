@@ -86,6 +86,14 @@
       <button id="btn-clear-yes">예</button>
       <button id="btn-clear-no">아니오</button>
     </div>
+    <!-- 일시정지 모달 -->
+    <div id="pause-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <h2>게임이 일시 중단되었습니다</h2>
+        <button id="btn-resume">계속하기</button>
+        <button id="btn-exit">게임 중단</button>
+      </div>
+    </div>
     <!-- 게임 설정 메뉴 UI-->
     <div id="option-menu" style="display: none">
       <h2>게임 설정</h2>
@@ -100,6 +108,10 @@
       <label>
         <input type="checkbox" id="item-toggle" checked />
         아이템 사용
+      </label>
+      <label for="two-player-toggle" style="margin: 12px 0">
+        <input type="checkbox" id="two-player-toggle" />
+        2인 플레이 모드
       </label>
       <label style="margin: 12px 0">
         볼륨:
