@@ -455,3 +455,48 @@ input#initials-input {
   box-shadow: 0 0 10px #3df4fa88;
   transition: background 0.2s;
 }
+
+#pause-modal {
+  display: none; /* 처음에는 숨김 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 35;
+  background: rgba(20, 22, 30, 0.96);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+}
+
+#pause-modal h2 {
+  color: #ffe062;
+  font-size: 2rem;
+  margin-bottom: 24px;
+  text-align: center;
+  text-shadow: 0 0 10px #fd0;
+}
+
+#pause-modal .pause-buttons {
+  display: flex;
+  gap: 24px;
+}
+
+#pause-modal button {
+  background: #ff68ba;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#pause-modal button:hover {
+  background: #f3237d;
+}
