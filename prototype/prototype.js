@@ -83,6 +83,7 @@ function startGame(level) {
     '<span id="lives">목숨: <b>' + lives + "</b></span>"
   );
 
+
   const twoPlayerMode = $("#two-player-toggle").is(":checked");
 
   initGame(config, level, twoPlayerMode); // 여기서 게임 본체 세팅
@@ -232,6 +233,8 @@ function initGame(config, level, twoPlayerMode) {
         ctx.shadowBlur = 14;
       }
 
+
+      // 패들 둥근 모서리 그리기
       const px = paddle.x;
       const py = paddle.y;
       const pr = paddle.borderRadius;
@@ -258,6 +261,7 @@ function initGame(config, level, twoPlayerMode) {
         ctx.fillText(getEffectLabel(paddle.effect), px + pw / 2, py - 10);
       }
     });
+
 
     if (paddleEffect) {
       ctx.font = "bold 18px Pretendard, Arial";
@@ -366,7 +370,7 @@ function initGame(config, level, twoPlayerMode) {
         ball.dy = -config.ballSpeed;
       }
 
-      // 벽돌 충돌
+      // 벽돌 충돌 체크
       for (let b of bricks) {
         if (
           b.hp > 0 &&
@@ -378,13 +382,12 @@ function initGame(config, level, twoPlayerMode) {
           b.hp--;
           score += 100;
           ball.dy = -ball.dy;
-
+          // 벽돌 hp 따라 색상 바뀌는지 확인해볼 것
           if (itemEnabled && Math.random() < 0.2) {
             const types = ["paddle-widen", "ball-slow", "reverse-control"];
             const type = types[Math.floor(Math.random() * types.length)];
             spawnItem(type, b.x + b.width / 2, b.y + b.height);
           }
-
           break;
         }
       }
@@ -424,8 +427,41 @@ function initGame(config, level, twoPlayerMode) {
     if (bricks.every((b) => b.hp <= 0)) {
       cancelAnimationFrame(animId);
       clearInterval(timer);
-      const bonus = timeLeft * 150;
+      let bonus = 0;
+      switch (level) {
+        case 1:
+          bonus = timeLeft * 100;
+          break;
+        case 2:
+          bonus = timeLeft * 150;
+          break;
+        case 3:
+          bonus = timeLeft * 200;
+          break;
+      }
       score += bonus;
+      
+      let clearTime = 300 - timeLeft;
+      let clearTimeMin = Math.floor(clearTime / 60);
+      let clearTimeSec = Math.floor(clearTime % 60);
+      let timeLeftMin = Math.floor(timeLeft / 60);
+      let timeLeftSec = Math.floor(timeLeft % 60);
+      let str =
+        "클리어 시간 : " +
+        clearTimeMin +
+        "분 " +
+        clearTimeSec +
+        "초" +
+        "<br>" +
+        "남은 시간 : " +
+        timeLeftMin +
+        "분 " +
+        timeLeftSec +
+        "초" +
+        "<br>" +
+        "최종 점수: " +
+        score +
+        "점";
 
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
@@ -435,9 +471,16 @@ function initGame(config, level, twoPlayerMode) {
 
     animId = requestAnimationFrame(draw);
   }
-
+/*
+ < wnsseoe
   window.animId = requestAnimationFrame(draw);
+  
+  ---------- 
+  let animId = requestAnimationFrame(draw);
+  window.animId = animId;
+  */
 }
+
 // 타이머 시작/갱신
 function startTimer() {
   $("#timer").text(formatTime(timeLeft));
