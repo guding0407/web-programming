@@ -36,9 +36,12 @@
       </div>
       <!-- 게임 화면 -->
       <div id="game-screen" style="display: none">
-        <div>
+        <div id="status-bar">
           <span id="timer"></span>
-          <span id="score"></span>
+          <div id="score-container">
+            <img src="assets/score_64bit.png" id="score-label" />
+            <span id="score-value">0</span>
+          </div>
         </div>
         <canvas id="game-canvas" width="800" height="600"></canvas>
       </div>
