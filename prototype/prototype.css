@@ -16,39 +16,7 @@ body {
   font-style: normal;
 }
 
-p #howtoplay-text {
-  font-family: "gugi-regular", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  line-height: 1.6;
-  color: #fff;
-}
-#background {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  background: url("./assets/img/background.png") center center/cover no-repeat;
-  filter: brightness(0.85) saturate(1.22) contrast(1.08) blur(1.2px);
-  animation: bgMove 38s ease-in-out infinite alternate;
-  image-rendering: pixelated;
-}
-
-#background::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: inherit;
-  z-index: 1;
-  mix-blend-mode: screen;
-  opacity: 0.08;
-  animation: glitch 1.3s infinite ease-in-out alternate;
-  pointer-events: none;
-}
-
+/* Glitch 효과 : @ 사용 */
 @keyframes glitch {
   0% {
     transform: translate(0, 0);
@@ -93,6 +61,54 @@ p #howtoplay-text {
     background-position: 51% 51%;
     filter: brightness(0.85) saturate(1.22) blur(1.2px);
   }
+}
+
+p #howtoplay-text {
+  font-family: "gugi-regular", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.6;
+  color: #fff;
+}
+
+#intro {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background: url("./assets/img/intro.png") center center/cover no-repeat;
+  filter: brightness(0.85) saturate(1.22) contrast(1.08) blur(1.2px);
+  animation: bgMove 38s ease-in-out infinite alternate;
+  image-rendering: pixelated;
+}
+
+#background {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: url("./assets/img/background.png") center center/cover no-repeat;
+  filter: brightness(0.85) saturate(1.22) contrast(1.08) blur(1.2px);
+  animation: bgMove 38s ease-in-out infinite alternate;
+  image-rendering: pixelated;
+}
+
+#background::before,
+#intro::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  z-index: 1;
+  mix-blend-mode: screen;
+  opacity: 0.08;
+  animation: glitch 1.3s infinite ease-in-out alternate;
+  pointer-events: none;
 }
 
 #content {
