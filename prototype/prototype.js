@@ -24,7 +24,7 @@ $(document).ready(function () {
 // 난이도별 게임 설정값 객체는 그대로 사용
 const GAME_LEVELS = {
   1: {
-    ballSpeed: 2,
+    ballSpeed: 4,
     paddleWidth: 120,
     brickRows: 3,
     brickCols: 7,
@@ -32,7 +32,7 @@ const GAME_LEVELS = {
     borderRadius: 8,
   },
   2: {
-    ballSpeed: 4,
+    ballSpeed: 6,
     paddleWidth: 90,
     brickRows: 4,
     brickCols: 9,
@@ -40,7 +40,7 @@ const GAME_LEVELS = {
     borderRadius: 8,
   },
   3: {
-    ballSpeed: 6,
+    ballSpeed: 10,
     paddleWidth: 70,
     brickRows: 5,
     brickCols: 12,
@@ -107,7 +107,7 @@ function startGame(level) {
 
 function initGame(config, level, twoPlayerMode) {
   const canvas = document.getElementById("game-canvas");
-  const ctx = canvas.getContext("2d");
+  const context = canvas.getContext("2d");
 
   // 게임 오브젝트(공, 패들, 벽돌)
   paddles = [];
@@ -225,66 +225,22 @@ function initGame(config, level, twoPlayerMode) {
 
   // 게임 루프
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height);
     if (isPaused) return;
 
-    // 벽돌 그리기 (이미지 적용 전)
-    /*for (let b of bricks) {
-      if (b.hp > 0) {
-        ctx.fillStyle = getBrickColor(b);
-        ctx.fillRect(b.x, b.y, b.width, b.height);
-      }
-    }*/
     for (let b of bricks) {
-      // 이미지 적용
       if (b.hp > 0) {
-        const blockImage = imageAssets.blocks[b.maxHp - 1];
-        ctx.drawImage(blockImage, b.x, b.y, b.width, b.height);
+        let imageIndex = Math.max(
+          0,
+          Math.min(b.hp - 1, imageAssets.blocks.length - 1)
+        );
+        const blockImage = imageAssets.blocks[imageIndex];
+        context.drawImage(blockImage, b.x, b.y, b.width, b.height);
       }
     }
 
-    // 패들 (이미지 적용 전)
-    /*paddles.forEach((paddle, idx) => {
-      if (paddle.effect === "paddle-widen") {
-        ctx.fillStyle = "#3df4fa";
-        ctx.shadowColor = "#3df4fa";
-        ctx.shadowBlur = 20;
-      } else {
-        ctx.fillStyle = idx === 0 ? "#0095DD" : "#ff68ba";
-        ctx.shadowColor = ctx.fillStyle;
-        ctx.shadowBlur = 14;
-      }
-
-
-      // 패들 둥근 모서리 그리기
-      const px = paddle.x;
-      const py = paddle.y;
-      const pr = paddle.borderRadius;
-      const pw = paddle.width;
-      const ph = paddle.height;
-
-      ctx.beginPath();
-      ctx.moveTo(px + pr, py);
-      ctx.lineTo(px + pw - pr, py);
-      ctx.quadraticCurveTo(px + pw, py, px + pw, py + pr);
-      ctx.lineTo(px + pw, py + ph - pr);
-      ctx.quadraticCurveTo(px + pw, py + ph, px + pw - pr, py + ph);
-      ctx.lineTo(px + pr, py + ph);
-      ctx.quadraticCurveTo(px, py + ph, px, py + ph - pr);
-      ctx.lineTo(px, py + pr);
-      ctx.quadraticCurveTo(px, py, px + pr, py);
-      ctx.closePath();
-      ctx.fill();
-
-      if (paddle.effect) {
-        ctx.font = "bold 16px Pretendard";
-        ctx.fillStyle = "#fff";
-        ctx.textAlign = "center";
-        ctx.fillText(getEffectLabel(paddle.effect), px + pw / 2, py - 10);
-      }
-    });*/
     paddles.forEach((paddle, idx) => {
-      ctx.drawImage(
+      context.drawImage(
         imageAssets.paddle[idx],
         paddle.x,
         paddle.y,
@@ -292,10 +248,10 @@ function initGame(config, level, twoPlayerMode) {
         paddle.height
       );
       if (paddle.effect) {
-        ctx.font = "bold 16px Pretendard";
-        ctx.fillStyle = "#fff";
-        ctx.textAlign = "center";
-        ctx.fillText(
+        context.font = "bold 16px Pretendard";
+        context.fillStyle = "#fff";
+        context.textAlign = "center";
+        context.fillText(
           getEffectLabel(paddle.effect),
           paddle.x + paddle.width / 2,
           paddle.y - 10
@@ -304,10 +260,10 @@ function initGame(config, level, twoPlayerMode) {
     });
 
     if (paddleEffect) {
-      ctx.font = "bold 18px Pretendard, Arial";
-      ctx.fillStyle = "#ffffff";
-      ctx.textAlign = "center";
-      ctx.fillText(
+      context.font = "bold 18px Pretendard, Arial";
+      context.fillStyle = "#ffffff";
+      context.textAlign = "center";
+      context.fillText(
         getEffectLabel(paddleEffect),
         paddle.x + paddle.width / 2,
         canvas.height - paddle.height - 16
@@ -315,8 +271,7 @@ function initGame(config, level, twoPlayerMode) {
     }
 
     // 점수, 타이머 표시
-    /*    $("#score").text("점수: " + score);*/
-    $("#score-value").text(score); // 기존 $("#score").text(...) 지우기
+    $("#score-value").text(score);
 
     // 패들 이동
     // 플레이어 1 이동
@@ -340,7 +295,7 @@ function initGame(config, level, twoPlayerMode) {
       paddle.x -= dir * paddle.speed;
 
     // 플레이어 2 이동
-    // ▶ 2P 패들 이동(존재할 때만)
+    // 2P 패들 이동(존재할 때만)
     if (paddles.length > 1) {
       const paddle2 = paddles[1];
       const dir2 = paddle2.isControlReversed ? -1 : 1;
@@ -363,13 +318,7 @@ function initGame(config, level, twoPlayerMode) {
     }
 
     balls.forEach((ball) => {
-      /*ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#fff";
-      ctx.fill();
-      ctx.closePath();
-*/
-      ctx.drawImage(
+      context.drawImage(
         imageAssets.ball,
         ball.x - ball.radius,
         ball.y - ball.radius,
@@ -402,27 +351,27 @@ function initGame(config, level, twoPlayerMode) {
       // 바닥에 떨어졌을 때
       if (ball.y > canvas.height + ball.radius) {
         const index = balls.indexOf(ball);
-        if (ball.isExtra) {
-          balls.splice(index, 1); // 그냥 제거만
-        } else {
-          balls.splice(index, 1);
+        balls.splice(index, 1);
+
+        if (balls.length === 0) {
           lives--;
           $("#lives").html("목숨: <b>" + lives + "</b>");
+
           if (lives <= 0) {
             cancelAnimationFrame(window.animId);
             clearInterval(timer);
             gameOver(false);
             return;
-          } else if (balls.length === 0) {
-            // 기본 공 재생성
-            balls.push({
-              x: canvas.width / 2,
-              y: canvas.height - 30,
-              radius: 10,
-              dx: config.ballSpeed,
-              dy: -config.ballSpeed,
-            });
           }
+
+          // 기본 공 재생성
+          balls.push({
+            x: canvas.width / 2,
+            y: canvas.height - 30,
+            radius: 10,
+            dx: config.ballSpeed,
+            dy: -config.ballSpeed,
+          });
         }
       }
 
@@ -438,9 +387,11 @@ function initGame(config, level, twoPlayerMode) {
           b.hp--;
           score += 100;
           ball.dy = -ball.dy;
-          // 벽돌 hp 따라 색상 바뀌는지 확인해볼 것
+
+          // 충돌 후 벽돌 이미지 변경: draw 루프에서 b.hp에 따라 자동 적용됨
+
           if (itemEnabled && Math.random() < 0.2) {
-            // test
+            // 20% 확률로 아이템 생성
             const types = [
               "paddle-widen",
               "ball-slow",
@@ -465,11 +416,11 @@ function initGame(config, level, twoPlayerMode) {
 
       // 그리기
       if (item.type === "ball-count-up") {
-        ctx.fillStyle = "#f7d84a"; // 노란색 같은 걸로
+        context.fillStyle = "#f7d84a"; // 노란색 같은 걸로
       } else {
-        ctx.fillStyle = "#3df4fa";
+        context.fillStyle = "#3df4fa";
       }
-      ctx.fillRect(item.x, item.y, item.width, item.height);
+      context.fillRect(item.x, item.y, item.width, item.height);
 
       // 패들과 충돌 감지
       paddles.forEach((paddle) => {
@@ -561,14 +512,6 @@ function initGame(config, level, twoPlayerMode) {
 
     animId = requestAnimationFrame(draw);
   }
-  /*
- < wnsseoe
-  window.animId = requestAnimationFrame(draw);
-  
-  ---------- 
-  let animId = requestAnimationFrame(draw);
-  window.animId = animId;
-  */
   window.animId = requestAnimationFrame(draw);
 }
 
