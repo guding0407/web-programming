@@ -71,6 +71,8 @@ let bricks = [];
 let items = [];
 let isPaused = false;
 let MAX_BALLS = 3; //공의 최대 개수
+let canvas = null;
+let context = null
 
 // 이미지는 배열로 관리
 const imageAssets = {
@@ -106,8 +108,8 @@ function startGame(level) {
 }
 
 function initGame(config, level, twoPlayerMode) {
-  const canvas = document.getElementById("game-canvas");
-  const context = canvas.getContext("2d");
+  canvas = document.getElementById("game-canvas");
+  context = canvas.getContext("2d");
 
   // 게임 오브젝트(공, 패들, 벽돌)
   paddles = [];
@@ -224,7 +226,7 @@ function initGame(config, level, twoPlayerMode) {
     });
 
   // 게임 루프
-  function draw() {
+  window.draw = function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (isPaused) return;
 
@@ -390,7 +392,7 @@ function initGame(config, level, twoPlayerMode) {
 
           // 충돌 후 벽돌 이미지 변경: draw 루프에서 b.hp에 따라 자동 적용됨
 
-          if (itemEnabled && Math.random() < 0.2) {
+          if (itemEnabled && Math.random() < 0.9) {
             // 20% 확률로 아이템 생성
             const types = [
               "paddle-widen",
@@ -413,6 +415,12 @@ function initGame(config, level, twoPlayerMode) {
 
       // 아이템 이동
       item.y += item.dy;
+
+      /*// 🎯 바닥 아래로 내려갔다면 비활성화
+      if (item.y > canvas.height) {
+        item.active = false;
+        continue;
+      }*/
 
       // 그리기
       if (item.type === "ball-count-up") {
@@ -559,8 +567,18 @@ function applyEffect(paddle, type, duration) {
     case "paddle-widen": {
       const orgWidth = paddle.width;
       paddle.width *= 1.5;
+
+      // 패들이 오른쪽 벽을 넘지 않도록 보정
+      if (paddle.x + paddle.width > canvas.width) {
+        paddle.x = canvas.width - paddle.width;
+      }
+
       paddle.revertFn = () => {
         paddle.width = orgWidth;
+        // 되돌릴 때도 오른쪽 벗어나지 않도록 보정
+        if (paddle.x + paddle.width > canvas.width) {
+          paddle.x = canvas.width - paddle.width;
+        }
       };
       break;
     }
@@ -572,6 +590,19 @@ function applyEffect(paddle, type, duration) {
       break;
     }
     case "ball-slow": {
+      balls.forEach((b) => {
+        b.dx = Math.sign(b.dx) * Math.abs(b.dx * 0.5);
+        b.dy = Math.sign(b.dy) * Math.abs(b.dy * 0.5);
+      });
+      paddle.revertFn = () => {
+        balls.forEach((b) => {
+          b.dx = Math.sign(b.dx) * Math.abs(b.dx * 2);
+          b.dy = Math.sign(b.dy) * Math.abs(b.dy * 2);
+        });
+      };
+      break;
+    }
+    /*case "ball-slow": {
       // 모든 공 속도 절반
       const saved = balls.map((b) => ({ b, dx: b.dx, dy: b.dy }));
       balls.forEach((b) => {
@@ -584,7 +615,8 @@ function applyEffect(paddle, type, duration) {
           b.dy = dy;
         });
       break;
-    }
+    }*/
+
   }
 
   // 3) 메타데이터 업데이트
