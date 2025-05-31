@@ -212,15 +212,15 @@ function initGame(config, level, twoPlayerMode) {
       if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
       if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
 
-      if (e.key === "a" || e.key === "A") aPressed = true;
-      if (e.key === "d" || e.key === "D") dPressed = true;
+      if (e.key === "a" || e.key === "A" || e.key === "ㅁ") aPressed = true;
+      if (e.key === "d" || e.key === "D" || e.key === "ㅇ") dPressed = true;
     })
     .on("keyup", function (e) {
       if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
       if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
 
-      if (e.key === "a" || e.key === "A") aPressed = false;
-      if (e.key === "d" || e.key === "D") dPressed = false;
+      if (e.key === "a" || e.key === "A" || e.key === "ㅁ") aPressed = false;
+      if (e.key === "d" || e.key === "D" || e.key === "ㅇ") dPressed = false;
     });
 
   // 게임 루프
