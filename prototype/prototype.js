@@ -1,3 +1,8 @@
+// 게임 시작 시 오디오 로드
+$(document).ready(function () {
+  loadSettings();
+});
+
 // main-menu와 난이도 메뉴 전환
 $("#btn-start").click(function () {
   $("#main-menu").hide();
@@ -14,11 +19,6 @@ $(".btn-difficulty").click(function () {
 $("#btn-difficulty-back").click(function () {
   $("#difficulty-menu").hide();
   $("#main-menu").show();
-});
-
-// 게임 시작 시 오디오 로드
-$(document).ready(function () {
-  loadSettings();
 });
 
 // 난이도별 게임 설정값 객체는 그대로 사용
@@ -55,10 +55,7 @@ let score = 0;
 let timer = null;
 let timeLeft = 300; // 5분 = 300초
 let lives = 5; // 목숨
-let bgmAudio = new Audio("bgm.mp3");
 let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
-bgmAudio.volume = volume;
-bgmAudio.loop = true;
 let sfxEnabled = true;
 let itemEnabled = true;
 let isPaddleWidened = false;
@@ -72,7 +69,16 @@ let items = [];
 let isPaused = false;
 let MAX_BALLS = 3; //공의 최대 개수
 
-// 이미지는 배열로 관리
+const bgmAsset = new Audio("assets/audio/bgm.mp3");
+bgmAudio = bgmAsset; // 기본 배경음악 설정
+bgmAudio.volume = volume; // 초기 볼륨 설정
+
+const audioAssets = {
+  brickHit: new Audio("assets/audio/brick_hit.mp3"),
+  itemSpawn: new Audio("assets/audio/item_spawn.mp3"),
+  paddleBounce: new Audio("assets/audio/paddle_bounce.mp3"),
+};
+
 const imageAssets = {
   ball: new Image(),
   paddle: [new Image(), new Image()],
@@ -80,12 +86,12 @@ const imageAssets = {
   blocks: [new Image(), new Image(), new Image()],
 };
 
-imageAssets.ball.src = "assets/ball_64bit.png";
-imageAssets.paddle[0].src = "assets/paddle_64bit_1.png";
-imageAssets.paddle[1].src = "assets/paddle_64bit_2.png";
-imageAssets.blocks[0].src = "assets/level_1_block_64bit.png";
-imageAssets.blocks[1].src = "assets/level_2_block_64bit.png";
-imageAssets.blocks[2].src = "assets/level_3_block_64bit.png";
+imageAssets.ball.src = "assets/img/ball_64bit.png";
+imageAssets.paddle[0].src = "assets/img/paddle_64bit_1.png";
+imageAssets.paddle[1].src = "assets/img/paddle_64bit_2.png";
+imageAssets.blocks[0].src = "assets/img/level_1_block_64bit.png";
+imageAssets.blocks[1].src = "assets/img/level_2_block_64bit.png";
+imageAssets.blocks[2].src = "assets/img/level_3_block_64bit.png";
 
 function startGame(level) {
   const config = GAME_LEVELS[level];
@@ -342,6 +348,8 @@ function initGame(config, level, twoPlayerMode) {
           ball.x < paddle.x + paddle.width
         ) {
           ball.dy = -Math.abs(ball.dy);
+          audioAssets.paddleBounce.currentTime = 0;
+          audioAssets.paddleBounce.play();
           let hit =
             (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
           ball.dx += hit;
@@ -385,6 +393,8 @@ function initGame(config, level, twoPlayerMode) {
           ball.y + ball.radius > b.y
         ) {
           b.hp--;
+          audioAssets.brickHit.currentTime = 0;
+          audioAssets.brickHit.play();
           score += 100;
           ball.dy = -ball.dy;
 
@@ -401,6 +411,8 @@ function initGame(config, level, twoPlayerMode) {
             ];
             const type = types[Math.floor(Math.random() * types.length)];
             spawnItem(type, b.x + b.width / 2, b.y + b.height);
+            audioAssets.itemSpawn.currentTime = 0;
+            audioAssets.itemSpawn.play();
           }
           break;
         }
