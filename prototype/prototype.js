@@ -1,6 +1,16 @@
 // 게임 시작 시 오디오 로드
 $(document).ready(function () {
   loadSettings();
+  $("#intro").show();
+});
+
+$("#intro").click(function () {
+  $(this).fadeOut(2000);
+  $("#main-menu").show();
+  // 배경음악 시작
+  if (localStorage.getItem("setting_bgm") !== "false") {
+    bgmAudio.play();
+  }
 });
 
 // main-menu와 난이도 메뉴 전환
