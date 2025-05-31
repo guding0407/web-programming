@@ -72,15 +72,17 @@ let items = [];
 let isPaused = false;
 let MAX_BALLS = 3; //공의 최대 개수
 
-// 이미지 적
+// 이미지는 배열로 관리
 const imageAssets = {
   ball: new Image(),
-  paddle: new Image(),
-  blocks: [new Image(), new Image(), new Image()]
+  paddle: [new Image(), new Image()],
+  // 패들 이미지 배열로 변경 (플레이어 1, 2용)
+  blocks: [new Image(), new Image(), new Image()],
 };
 
 imageAssets.ball.src = "assets/ball_64bit.png";
-imageAssets.paddle.src = "assets/paddle_64bit.png";
+imageAssets.paddle[0].src = "assets/paddle_64bit_1.png";
+imageAssets.paddle[1].src = "assets/paddle_64bit_2.png";
 imageAssets.blocks[0].src = "assets/level_1_block_64bit.png";
 imageAssets.blocks[1].src = "assets/level_2_block_64bit.png";
 imageAssets.blocks[2].src = "assets/level_3_block_64bit.png";
@@ -96,7 +98,6 @@ function startGame(level) {
   $("#game-screen > div").append(
     '<span id="lives">목숨: <b>' + lives + "</b></span>"
   );
-
 
   const twoPlayerMode = $("#two-player-toggle").is(":checked");
 
@@ -234,7 +235,8 @@ function initGame(config, level, twoPlayerMode) {
         ctx.fillRect(b.x, b.y, b.width, b.height);
       }
     }*/
-    for (let b of bricks) { // 이미지 적용
+    for (let b of bricks) {
+      // 이미지 적용
       if (b.hp > 0) {
         const blockImage = imageAssets.blocks[b.maxHp - 1];
         ctx.drawImage(blockImage, b.x, b.y, b.width, b.height);
@@ -282,15 +284,24 @@ function initGame(config, level, twoPlayerMode) {
       }
     });*/
     paddles.forEach((paddle, idx) => {
-      ctx.drawImage(imageAssets.paddle, paddle.x, paddle.y, paddle.width, paddle.height);
+      ctx.drawImage(
+        imageAssets.paddle[idx],
+        paddle.x,
+        paddle.y,
+        paddle.width,
+        paddle.height
+      );
       if (paddle.effect) {
         ctx.font = "bold 16px Pretendard";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.fillText(getEffectLabel(paddle.effect), paddle.x + paddle.width / 2, paddle.y - 10);
+        ctx.fillText(
+          getEffectLabel(paddle.effect),
+          paddle.x + paddle.width / 2,
+          paddle.y - 10
+        );
       }
     });
-
 
     if (paddleEffect) {
       ctx.font = "bold 18px Pretendard, Arial";
@@ -304,7 +315,7 @@ function initGame(config, level, twoPlayerMode) {
     }
 
     // 점수, 타이머 표시
-/*    $("#score").text("점수: " + score);*/
+    /*    $("#score").text("점수: " + score);*/
     $("#score-value").text(score); // 기존 $("#score").text(...) 지우기
 
     // 패들 이동
@@ -428,8 +439,15 @@ function initGame(config, level, twoPlayerMode) {
           score += 100;
           ball.dy = -ball.dy;
           // 벽돌 hp 따라 색상 바뀌는지 확인해볼 것
-          if (itemEnabled && Math.random() < 0.2) { // test
-            const types = ["paddle-widen", "ball-slow", "reverse-control", "ball-count-up", "life-up"];
+          if (itemEnabled && Math.random() < 0.2) {
+            // test
+            const types = [
+              "paddle-widen",
+              "ball-slow",
+              "reverse-control",
+              "ball-count-up",
+              "life-up",
+            ];
             const type = types[Math.floor(Math.random() * types.length)];
             spawnItem(type, b.x + b.width / 2, b.y + b.height);
           }
@@ -475,14 +493,15 @@ function initGame(config, level, twoPlayerMode) {
                 radius: 10,
                 dx: (Math.random() < 0.5 ? -1 : 1) * config.ballSpeed,
                 dy: -config.ballSpeed,
-                isExtra: true  // 추가된 공인지 구분용
+                isExtra: true, // 추가된 공인지 구분용
               });
               paddle.effect = "ball-count-up";
               setTimeout(() => {
                 if (paddle.effect === "ball-count-up") paddle.effect = null;
               }, 5000);
             }
-          } else if (item.type === "life-up") {  // 목숨 증가
+          } else if (item.type === "life-up") {
+            // 목숨 증가
             if (lives < 9) lives++;
             $("#lives").html("목숨: <b>" + lives + "</b>");
             paddle.effect = "life-up";
@@ -511,7 +530,7 @@ function initGame(config, level, twoPlayerMode) {
           break;
       }
       score += bonus;
-      
+
       let clearTime = 300 - timeLeft;
       let clearTimeMin = Math.floor(clearTime / 60);
       let clearTimeSec = Math.floor(clearTime % 60);
@@ -542,7 +561,7 @@ function initGame(config, level, twoPlayerMode) {
 
     animId = requestAnimationFrame(draw);
   }
-/*
+  /*
  < wnsseoe
   window.animId = requestAnimationFrame(draw);
   
