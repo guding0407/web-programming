@@ -14,8 +14,7 @@ body {
   width: 100%;
   height: 100%;
   z-index: 0;
-  background: url("./assets/background.png") center center/cover
-    no-repeat;
+  background: url("./assets/background.png") center center/cover no-repeat;
   filter: brightness(0.85) saturate(1.22) contrast(1.08) blur(1.2px);
   animation: bgMove 38s ease-in-out infinite alternate;
   image-rendering: pixelated;
@@ -180,14 +179,14 @@ button:hover {
 }
 
 #status-bar {
-  display: flex;               /* 필수: 가로 정렬 */
-  flex-direction: row;         /* 기본값이긴 하지만 명시해두자 */
-  justify-content: center;     /* 가운데 정렬 */
-  align-items: center;         /* 수직 정렬 */
-  gap: 40px;                   /* 요소 사이 간격 */
+  display: flex; /* 필수: 가로 정렬 */
+  flex-direction: row; /* 기본값이긴 하지만 명시해두자 */
+  justify-content: center; /* 가운데 정렬 */
+  align-items: center; /* 수직 정렬 */
+  gap: 40px; /* 요소 사이 간격 */
   width: 500px;
   margin-top: 10px;
-  position: relative;          /* 필요 시 조정 */
+  position: relative; /* 필요 시 조정 */
 }
 
 #score-container {
@@ -201,7 +200,7 @@ button:hover {
 }
 
 #score-value {
-  font-family: 'Press Start 2P', 'Pixel', 'Pretendard', monospace;
+  font-family: "Press Start 2P", "Pixel", "Pretendard", monospace;
   font-size: 18px;
   color: #3df4fa;
   text-shadow: 0 0 4px #3df4fa, 0 0 8px #0ff;
