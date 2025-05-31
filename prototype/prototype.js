@@ -803,3 +803,15 @@ $("#btn-howtoplay-back").click(function () {
   $("#howtoplay-menu").hide();
   $("#main-menu").show();
 });
+
+// 시나리오 설명 열기
+$("#btn-scenario").click(function () {
+  $("#main-menu").hide();
+  $("#scenario-menu").show();
+});
+
+// 시나리오 설명 → 메뉴로 돌아가기
+$("#btn-scenario-back").click(function () {
+  $("#scenario-menu").hide();
+  $("#main-menu").show();
+});

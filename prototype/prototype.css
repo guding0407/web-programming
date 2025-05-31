@@ -529,3 +529,55 @@ input#initials-input {
 #pause-modal button:hover {
   background: #f3237d;
 }
+
+#scenario-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+}
+
+#scenario-menu h2 {
+  color: #3df4fa;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-align: center;
+  text-shadow: 0 0 10px #21f4fa;
+}
+
+#scenario-menu div {
+  margin-bottom: 30px;
+  font-size: 1.2rem;
+  color: #fff;
+  background: rgba(40, 45, 60, 0.9);
+  border-radius: 14px;
+  padding: 24px 36px;
+  box-shadow: 0 2px 12px #20e4fa44;
+  text-align: center;
+  line-height: 1.75;
+  max-width: 720px;
+}
+
+#btn-scenario-back {
+  width: 180px;
+  height: 52px;
+  font-size: 1.1rem;
+  background: #ff68ba;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  margin-top: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+#btn-scenario-back:hover {
+  background: #f3237d;
+}
