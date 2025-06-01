@@ -19,6 +19,21 @@ $("#btn-start").click(function () {
   $("#difficulty-menu").show();
 });
 
+// 시나리오 버튼 클릭
+$("#prev_scenario").click(function () {
+  const scenarios = $(".scenario-content");
+  if (currentScenario < scenarios.length - 1) {
+    currentScenario++;
+    updateScenarioView();
+  }
+});
+
+$("#next_scenario").click(function () {
+  if (currentScenario > 0) {
+    currentScenario--;
+    updateScenarioView();
+  }
+});
 // 난이도 버튼 클릭
 $(".btn-difficulty").click(function () {
   const level = $(this).data("level");
@@ -79,7 +94,7 @@ let items = [];
 let isPaused = false;
 let MAX_BALLS = 3; //공의 최대 개수
 let canvas = null;
-let context = null
+let context = null;
 
 const bgmAsset = new Audio("assets/audio/bgm.mp3");
 bgmAudio = bgmAsset; // 기본 배경음악 설정
@@ -242,7 +257,7 @@ function initGame(config, level, twoPlayerMode) {
     });
 
   // 게임 루프
-  window.draw = function() {
+  window.draw = function () {
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (isPaused) return;
 
@@ -438,7 +453,7 @@ function initGame(config, level, twoPlayerMode) {
       // 아이템 이동
       item.y += item.dy;
 
-      /*// 🎯 바닥 아래로 내려갔다면 비활성화
+      /*  바닥 아래로 내려갔다면 비활성화
       if (item.y > canvas.height) {
         item.active = false;
         continue;
@@ -541,7 +556,7 @@ function initGame(config, level, twoPlayerMode) {
     }
 
     animId = requestAnimationFrame(draw);
-  }
+  };
   window.animId = requestAnimationFrame(draw);
 }
 
@@ -638,7 +653,6 @@ function applyEffect(paddle, type, duration) {
         });
       break;
     }*/
-
   }
 
   // 3) 메타데이터 업데이트
@@ -869,3 +883,20 @@ $("#btn-scenario-back").click(function () {
   $("#scenario-menu").hide();
   $("#main-menu").show();
 });
+
+// 시나리오 설명 페이지 네비게이션
+let currentScenario = 0;
+
+function updateScenarioView() {
+  const scenarios = $(".scenario-content");
+  scenarios.hide();
+  $(scenarios[currentScenario]).show();
+
+  // prev_scenario: next
+  // next_scenario: prev
+  $("#prev_scenario").prop(
+    "disabled",
+    currentScenario === scenarios.length - 1
+  );
+  $("#next_scenario").prop("disabled", currentScenario === 0);
+}

@@ -236,6 +236,35 @@ button:hover {
   opacity: 1;
 }
 
+#scenario-menu > div > img {
+  width: 400px;
+  height: 280px;
+  margin-bottom: 20px;
+}
+
+/* 시나리오 설명 내 scenario-content 고정 크기 및 레이아웃 */
+
+.scenario-content {
+  width: 100vw;
+  height: 100vh;
+  max-width: 500px;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.scenario-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 16px;
+  border-radius: 15px;
+}
+
+#scenario-btn {
+  margin-bottom: 0;
+}
 #timer,
 #score {
   font-size: 1.4rem;
