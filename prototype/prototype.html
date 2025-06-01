@@ -15,6 +15,30 @@
   <body>
     <div id="intro"></div>
     <div id="background"></div>
+    <div id="start-story" style="display: none">
+      <div class="story-frame">
+        <img id="story-image" src="" alt="story scene" />
+        <p id="story-text"></p>
+      </div>
+    </div>
+    <div id="stage1-story" style="display: none">
+      <div class="story-frame">
+        <img id="stage1-image" src="" alt="stage-1 scene" />
+        <p id="stage1-text"></p>
+      </div>
+    </div>
+    <div id="stage2-story" style="display: none">
+      <div class="story-frame">
+        <img id="stage2-image" src="" alt="stage-1 scene" />
+        <p id="stage2-text"></p>
+      </div>
+    </div>
+    <div id="stage3-story" style="display: none">
+      <div class="story-frame">
+        <img id="stage3-image" src="" alt="stage-1 scene" />
+        <p id="stage3-text"></p>
+      </div>
+    </div>
     <div id="content">
       <!-- 메인 메뉴 -->
       <div id="main-menu">
@@ -63,11 +87,10 @@
           />
           <p>
             당신은 디지털 무기 CORE BALL을 사용해 오염된 데이터 벽돌을 제거하고,
+            <br />
+            파편화된 도시 시스템을 복구해야 합니다. <br />
+            당신의 민첩함과 순발력이 도시의 운명을 결정합니다.
           </p>
-
-          <p>파편화된 도시 시스템을 복구해야 합니다.</p>
-
-          <p>당신의 민첩함과 순발력이 도시의 운명을 결정합니다.</p>
         </div>
         <div id="scenario-btn">
           <button id="next_scenario">< prev</button>
@@ -80,9 +103,15 @@
       <!-- 2.1 난이도 선택 -->
       <div id="difficulty-menu" style="display: none">
         <h2>난이도 선택</h2>
-        <button class="btn-difficulty" data-level="1">초급</button>
-        <button class="btn-difficulty" data-level="2">중급</button>
-        <button class="btn-difficulty" data-level="3">고급</button>
+        <button class="btn-difficulty" data-level="1">
+          Stage 1 - 전송망 지하 구역
+        </button>
+        <button class="btn-difficulty" data-level="2">
+          Stage 2 - 중앙 서버 구역
+        </button>
+        <button class="btn-difficulty" data-level="3">
+          Stage 3 - 중앙 제어탑 최상층
+        </button>
         <button id="btn-difficulty-back">뒤로가기</button>
       </div>
       <!-- 2.2 게임 화면 -->
