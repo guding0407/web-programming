@@ -4,6 +4,10 @@ $(document).ready(function () {
   $("#intro").show();
 });
 
+const bgmAsset = new Audio("assets/audio/bgm.mp3");
+bgmAudio = bgmAsset; // 기본 배경음악 설정
+bgmAudio.volume = volume; // 초기 볼륨 설정
+
 // 스타트 시나리오
 const START_STORY_SCENES = [
   {
@@ -80,6 +84,29 @@ function playStartStory() {
 
   showScene();
 }
+
+// main-menu와 난이도 메뉴 전환
+$("#btn-start").click(function () {
+  $("#main-menu").hide();
+  $("#difficulty-menu").show();
+});
+
+// 1. 시나리오 설명에서 사용할 함수
+// 시나리오 이전 버튼
+$("#prev_scenario").click(function () {
+  const scenarios = $(".scenario-content");
+  if (currentScenario < scenarios.length - 1) {
+    currentScenario++;
+    updateScenarioView();
+  }
+});
+// 시나리오 다음 버튼
+$("#next_scenario").click(function () {
+  if (currentScenario > 0) {
+    currentScenario--;
+    updateScenarioView();
+  }
+});
 
 // Stage 1 시나리오
 const STAGE1_STORY_SCENES = [
@@ -268,27 +295,42 @@ function playStage3Story(level) {
   $ov.fadeIn(400, next);
 }
 
-// main-menu와 난이도 메뉴 전환
-$("#btn-start").click(function () {
+// 게임 설명
+$("#btn-howtoplay").click(function () {
   $("#main-menu").hide();
-  $("#difficulty-menu").show();
+  $("#howtoplay-menu").show();
+});
+$("#btn-howtoplay-back").click(function () {
+  $("#howtoplay-menu").hide();
+  $("#main-menu").show();
 });
 
-// 시나리오 버튼 클릭
-$("#prev_scenario").click(function () {
+// 시나리오 설명 열기
+$("#btn-scenario").click(function () {
+  $("#main-menu").hide();
+  $("#scenario-menu").show();
+});
+
+// 시나리오 설명 -> 메뉴로 돌아가기
+$("#btn-scenario-back").click(function () {
+  $("#scenario-menu").hide();
+  $("#main-menu").show();
+});
+
+// 시나리오 설명 -> 이전, 다음 버튼
+let currentScenario = 0;
+
+function updateScenarioView() {
   const scenarios = $(".scenario-content");
-  if (currentScenario < scenarios.length - 1) {
-    currentScenario++;
-    updateScenarioView();
-  }
-});
+  scenarios.hide();
+  $(scenarios[currentScenario]).show();
 
-$("#next_scenario").click(function () {
-  if (currentScenario > 0) {
-    currentScenario--;
-    updateScenarioView();
-  }
-});
+  $("#prev_scenario").prop(
+    "disabled",
+    currentScenario === scenarios.length - 1
+  );
+  $("#next_scenario").prop("disabled", currentScenario === 0);
+}
 
 // 난이도 버튼 클릭 → Stage1 스토리 → 게임
 $(".btn-difficulty")
@@ -370,16 +412,14 @@ let MAX_BALLS = 3; //공의 최대 개수
 let canvas = null;
 let context = null;
 
-const bgmAsset = new Audio("assets/audio/bgm.mp3");
-bgmAudio = bgmAsset; // 기본 배경음악 설정
-bgmAudio.volume = volume; // 초기 볼륨 설정
-
+// 게임 화면 효과음은 객체로 관리
 const audioAssets = {
   brickHit: new Audio("assets/audio/brick_hit.mp3"),
   itemSpawn: new Audio("assets/audio/item_spawn.mp3"),
   paddleBounce: new Audio("assets/audio/paddle_bounce.mp3"),
 };
 
+// 게임 화면 구성 이미지는 객체로 관리
 const imageAssets = {
   ball: new Image(),
   paddle: [new Image(), new Image()],
@@ -394,6 +434,7 @@ imageAssets.blocks[0].src = "assets/img/level_1_block_64bit.png";
 imageAssets.blocks[1].src = "assets/img/level_2_block_64bit.png";
 imageAssets.blocks[2].src = "assets/img/level_3_block_64bit.png";
 
+// 게임 시작 함수
 function startGame(level) {
   const config = GAME_LEVELS[level];
   score = 0;
@@ -412,6 +453,7 @@ function startGame(level) {
   startTimer();
 }
 
+// 게임 화면 구현 함수
 function initGame(config, level, twoPlayerMode) {
   canvas = document.getElementById("game-canvas");
   context = canvas.getContext("2d");
@@ -859,15 +901,7 @@ function onBrickBroken() {
   }
 }
 
-// 벽돌 색상
-function getBrickColor(b) {
-  const ratio = b.hp / b.maxHp;
-  if (ratio > 0.66) return "#ffc542";
-  else if (ratio > 0.33) return "#ff9442";
-  return "#ff5555";
-}
-
-// 단일 효 적용 유틸
+// 효과 적용 함수
 function applyEffect(paddle, type, duration) {
   // 1) 이전 효과 제거
   if (paddle.revertFn) paddle.revertFn();
@@ -913,20 +947,6 @@ function applyEffect(paddle, type, duration) {
       };
       break;
     }
-    /*case "ball-slow": {
-      // 모든 공 속도 절반
-      const saved = balls.map((b) => ({ b, dx: b.dx, dy: b.dy }));
-      balls.forEach((b) => {
-        b.dx *= 0.5;
-        b.dy *= 0.5;
-      });
-      paddle.revertFn = () =>
-        saved.forEach(({ b, dx, dy }) => {
-          b.dx = dx;
-          b.dy = dy;
-        });
-      break;
-    }*/
   }
 
   // 3) 메타데이터 업데이트
@@ -958,33 +978,7 @@ function getEffectLabel(effect) {
   }
 }
 
-// 설정값 저장 및 반영 구현
-function loadSettings() {
-  const bgm = localStorage.getItem("setting_bgm");
-  const sfx = localStorage.getItem("setting_sfx");
-  const vol = parseInt(localStorage.getItem("setting_volume") || "100");
-  const item = localStorage.getItem("setting_item");
-
-  $("#volume-range").val(vol);
-  volume = vol / 100;
-  bgmAudio.volume = volume;
-
-  $("#bgm-toggle").prop("checked", bgm !== "false");
-  $("#sfx-toggle").prop("checked", sfx !== "false");
-  $("#item-toggle").prop("checked", item !== "false");
-
-  const twoPlayer = localStorage.getItem("setting_two_player");
-  $("#two-player-toggle").prop("checked", twoPlayer === "true");
-
-  if (bgm !== "false") {
-    bgmAudio.play();
-  } else {
-    bgmAudio.pause();
-  }
-
-  sfxEnabled = sfx !== "false";
-  itemEnabled = item !== "false";
-}
+// 3.게임 설정
 
 // 체크박스 이벤트 연결
 $("#bgm-toggle").change(function () {
@@ -1036,6 +1030,40 @@ $("#volume-range").on("input", function () {
   localStorage.setItem("setting_volume", Math.floor(vol * 100));
   volume = vol;
   bgmAudio.volume = volume;
+});
+
+// 설정값 저장 및 반영 구현
+function loadSettings() {
+  const bgm = localStorage.getItem("setting_bgm");
+  const sfx = localStorage.getItem("setting_sfx");
+  const vol = parseInt(localStorage.getItem("setting_volume") || "100");
+  const item = localStorage.getItem("setting_item");
+
+  $("#volume-range").val(vol);
+  volume = vol / 100;
+  bgmAudio.volume = volume;
+
+  $("#bgm-toggle").prop("checked", bgm !== "false");
+  $("#sfx-toggle").prop("checked", sfx !== "false");
+  $("#item-toggle").prop("checked", item !== "false");
+
+  const twoPlayer = localStorage.getItem("setting_two_player");
+  $("#two-player-toggle").prop("checked", twoPlayer === "true");
+
+  if (bgm !== "false") {
+    bgmAudio.play();
+  } else {
+    bgmAudio.pause();
+  }
+
+  sfxEnabled = sfx !== "false";
+  itemEnabled = item !== "false";
+}
+
+// 뒤로가기 이벤트
+$("#btn-option-back").click(function () {
+  $("#option-menu").hide();
+  $("#main-menu").show();
 });
 
 // 게임 클리어 시 명예의 전당에 등록하지 않을 때
@@ -1113,7 +1141,7 @@ $("#btn-option").click(function () {
   $("#option-menu").show();
 });
 
-// 일시중단
+// 2.6 일시정지 모달
 $("#btn-resume").click(function () {
   isPaused = false;
   $("#pause-modal").hide();
@@ -1129,48 +1157,3 @@ $("#btn-exit").click(function () {
   if (window.animId) cancelAnimationFrame(window.animId);
   if (timer) clearInterval(timer);
 });
-
-// 뒤로가기 버튼 처리
-$("#btn-option-back").click(function () {
-  $("#option-menu").hide();
-  $("#main-menu").show();
-});
-
-// 게임 설명
-$("#btn-howtoplay").click(function () {
-  $("#main-menu").hide();
-  $("#howtoplay-menu").show();
-});
-$("#btn-howtoplay-back").click(function () {
-  $("#howtoplay-menu").hide();
-  $("#main-menu").show();
-});
-
-// 시나리오 설명 열기
-$("#btn-scenario").click(function () {
-  $("#main-menu").hide();
-  $("#scenario-menu").show();
-});
-
-// 시나리오 설명 → 메뉴로 돌아가기
-$("#btn-scenario-back").click(function () {
-  $("#scenario-menu").hide();
-  $("#main-menu").show();
-});
-
-// 시나리오 설명 페이지 네비게이션
-let currentScenario = 0;
-
-function updateScenarioView() {
-  const scenarios = $(".scenario-content");
-  scenarios.hide();
-  $(scenarios[currentScenario]).show();
-
-  // prev_scenario: next
-  // next_scenario: prev
-  $("#prev_scenario").prop(
-    "disabled",
-    currentScenario === scenarios.length - 1
-  );
-  $("#next_scenario").prop("disabled", currentScenario === 0);
-}
