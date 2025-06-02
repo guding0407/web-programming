@@ -38,53 +38,58 @@ const START_STORY_SCENES = [
   },
 ];
 
-// 시나리오 재생 함수
-function playStartStory() {
-  const $overlay = $("#start-story");
-  const $img = $("#story-image");
-  const $txt = $("#story-text");
+// 스토리 플레이이
+function playStory(scenes, $overlay, onFinish) {
+  const $img = $overlay.find("img");
+  const $txt = $overlay.find("p");
+  const $skip = $overlay.find(".skip-btn").show(); // 버튼 표시
 
-  let idx = 0;
-  const FADE_DURATION = 800; // ms
-  const SHOW_DURATION = 3000; // “완전히 보이는” 시간
+  let idx = 0,
+    fadeT = null,
+    holdT = null;
 
-  function showScene() {
-    if (idx >= START_STORY_SCENES.length) {
-      // 모든 컷 끝 → 오버레이 닫고 메인 메뉴
-      $overlay.fadeOut(600, () => {
-        $("#main-menu").show();
-        if (localStorage.getItem("setting_bgm") !== "false") bgmAudio.play();
-      });
+  function next() {
+    if (idx >= scenes.length) {
+      $skip.hide(); // 버튼 숨김 (재사용 대비)
+      $overlay.fadeOut(600, onFinish); // 다음 단계 콜백
       return;
     }
-
     // 현재 컷 세팅
-    const scene = START_STORY_SCENES[idx];
-    $img.attr("src", scene.img);
-    $txt.html(scene.text);
+    const s = scenes[idx++];
+    $img.attr("src", s.img);
+    $txt.html(s.text);
 
-    // fade-in
-    $img.addClass("fade-in");
-    $txt.addClass("fade-in");
+    $img.add($txt).addClass("fade-in");
 
-    /*  타이밍 :
-        [fade-in 0.8s] → [정지 1.9s] → [fade-out 0.8s] */
-    setTimeout(() => {
-      // fade-out
-      $img.removeClass("fade-in").addClass("fade-out");
-      $txt.removeClass("fade-in").addClass("fade-out");
-
-      setTimeout(() => {
-        // 클래스 리셋 후 다음 컷
-        $img.removeClass("fade-out");
-        $txt.removeClass("fade-out");
-        idx += 1;
-        showScene();
-      }, FADE_DURATION); // 끝난 뒤 next
-    }, FADE_DURATION + SHOW_DURATION);
+    // [fade-in 0.8s] + [정지 1.9s] + [fade-out 0.8s]
+    fadeT = setTimeout(() => {
+      // 1.9s 뒤
+      $img.add($txt).removeClass("fade-in").addClass("fade-out");
+      holdT = setTimeout(() => {
+        // fade-out 종료
+        $img.add($txt).removeClass("fade-out"); // 클래스 리셋
+        next(); // 다음 컷 재귀
+      }, 800); // fade-out 시간
+    }, 800 + 1900); // fade-in 0.8s + 정지 1.9s
   }
 
-  showScene();
+  /* Skip : 타이머 제거 → idx를 끝으로 → next() */
+  $skip.one("click", () => {
+    clearTimeout(fadeT);
+    clearTimeout(holdT);
+    idx = scenes.length;
+    next();
+  });
+
+  /* overlay 켜고 재생 시작 */
+  $overlay.fadeIn(400, next);
+}
+
+function playStartStory() {
+  playStory(START_STORY_SCENES, $("#start-story"), () => {
+    $("#main-menu").show();
+    if (localStorage.getItem("setting_bgm") !== "false") bgmAudio.play();
+  });
 }
 
 // main-menu와 난이도 메뉴 전환
@@ -133,44 +138,7 @@ const STAGE1_STORY_SCENES = [
 ];
 
 function playStage1Story(level) {
-  const $ov = $("#stage1-story");
-  const $img = $("#stage1-image");
-  const $txt = $("#stage1-text");
-
-  let i = 0;
-  const F = 800; // fade ms
-  const S = 3000; // 정지 ms
-
-  function next() {
-    if (i >= STAGE1_STORY_SCENES.length) {
-      // 끝 → 오버레이 닫고 게임 시작
-      $ov.fadeOut(600, () => startGame(level));
-      return;
-    }
-
-    const s = STAGE1_STORY_SCENES[i];
-    $img.attr("src", s.img);
-    $txt.html(s.text);
-
-    $img.addClass("fade-in");
-    $txt.addClass("fade-in");
-
-    setTimeout(() => {
-      $img.removeClass("fade-in").addClass("fade-out");
-      $txt.removeClass("fade-in").addClass("fade-out");
-
-      setTimeout(() => {
-        $img.removeClass("fade-out");
-        $txt.removeClass("fade-out");
-        i += 1;
-        next();
-      }, F);
-    }, F + S);
-  }
-
-  // 오버레이 표시 & 시작
-  $("#difficulty-menu").hide();
-  $ov.fadeIn(400, next);
+  playStory(STAGE1_STORY_SCENES, $("#stage1-story"), () => startGame(level));
 }
 
 // Stage 2 시나리오
@@ -196,44 +164,7 @@ const STAGE2_STORY_SCENES = [
 ];
 
 function playStage2Story(level) {
-  const $ov = $("#stage2-story");
-  const $img = $("#stage2-image");
-  const $txt = $("#stage2-text");
-
-  let i = 0;
-  const F = 800; // fade ms
-  const S = 3000; // 정지 ms
-
-  function next() {
-    if (i >= STAGE2_STORY_SCENES.length) {
-      // 끝 → 오버레이 닫고 게임 시작
-      $ov.fadeOut(600, () => startGame(level));
-      return;
-    }
-
-    const s = STAGE2_STORY_SCENES[i];
-    $img.attr("src", s.img);
-    $txt.html(s.text);
-
-    $img.addClass("fade-in");
-    $txt.addClass("fade-in");
-
-    setTimeout(() => {
-      $img.removeClass("fade-in").addClass("fade-out");
-      $txt.removeClass("fade-in").addClass("fade-out");
-
-      setTimeout(() => {
-        $img.removeClass("fade-out");
-        $txt.removeClass("fade-out");
-        i += 1;
-        next();
-      }, F);
-    }, F + S);
-  }
-
-  // 오버레이 표시 & 시작
-  $("#difficulty-menu").hide();
-  $ov.fadeIn(400, next);
+  playStory(STAGE2_STORY_SCENES, $("#stage2-story"), () => startGame(level));
 }
 
 // Stage 3 시나리오
@@ -257,44 +188,7 @@ const STAGE3_STORY_SCENES = [
 ];
 
 function playStage3Story(level) {
-  const $ov = $("#stage3-story");
-  const $img = $("#stage3-image");
-  const $txt = $("#stage3-text");
-
-  let i = 0;
-  const F = 800; // fade ms
-  const S = 3000; // 정지 ms
-
-  function next() {
-    if (i >= STAGE3_STORY_SCENES.length) {
-      // 끝 → 오버레이 닫고 게임 시작
-      $ov.fadeOut(600, () => startGame(level));
-      return;
-    }
-
-    const s = STAGE3_STORY_SCENES[i];
-    $img.attr("src", s.img);
-    $txt.html(s.text);
-
-    $img.addClass("fade-in");
-    $txt.addClass("fade-in");
-
-    setTimeout(() => {
-      $img.removeClass("fade-in").addClass("fade-out");
-      $txt.removeClass("fade-in").addClass("fade-out");
-
-      setTimeout(() => {
-        $img.removeClass("fade-out");
-        $txt.removeClass("fade-out");
-        i += 1;
-        next();
-      }, F);
-    }, F + S);
-  }
-
-  // 오버레이 표시 & 시작
-  $("#difficulty-menu").hide();
-  $ov.fadeIn(400, next);
+  playStory(STAGE3_STORY_SCENES, $("#stage3-story"), () => startGame(level));
 }
 
 // 게임 설명
