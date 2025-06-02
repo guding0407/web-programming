@@ -4,9 +4,19 @@ $(document).ready(function () {
   $("#intro").show();
 });
 
+let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
+
 const bgmAsset = new Audio("assets/audio/bgm.mp3");
 bgmAudio = bgmAsset; // 기본 배경음악 설정
 bgmAudio.volume = volume; // 초기 볼륨 설정
+
+// 클릭 → 인트로 사라지고 스타트 시나리오 재생
+$("#intro").on("click", function () {
+  const $intro = $(this);
+  $intro.fadeOut(800, () => {
+    $("#start-story").fadeIn(400, playStartStory);
+  });
+});
 
 // 스타트 시나리오
 const START_STORY_SCENES = [
@@ -27,14 +37,6 @@ const START_STORY_SCENES = [
       "시스템을 복구하라!",
   },
 ];
-
-// 클릭 → 인트로 사라지고 스타트 시나리오 재생
-$("#intro").on("click", function () {
-  const $intro = $(this);
-  $intro.fadeOut(800, () => {
-    $("#start-story").fadeIn(400, playStartStory);
-  });
-});
 
 // 시나리오 재생 함수
 function playStartStory() {
@@ -332,28 +334,22 @@ function updateScenarioView() {
   $("#next_scenario").prop("disabled", currentScenario === 0);
 }
 
-// 난이도 버튼 클릭 → Stage1 스토리 → 게임
+// 난이도 버튼 클릭
 $(".btn-difficulty")
   .off("click")
   .on("click", function () {
-    const level = $(this).data("level");
-    playStage1Story(level);
-  });
-
-// 난이도 버튼 클릭 → Stage2 스토리 → 게임
-$(".btn-difficulty")
-  .off("click")
-  .on("click", function () {
-    const level = $(this).data("level");
-    playStage2Story(level);
-  });
-
-// 난이도 버튼 클릭 → Stage3 스토리 → 게임
-$(".btn-difficulty")
-  .off("click")
-  .on("click", function () {
-    const level = $(this).data("level");
-    playStage3Story(level);
+    const level = $(this).data("level"); // 1 · 2 · 3
+    switch (level) {
+      case 1:
+        playStage1Story(level);
+        break;
+      case 2:
+        playStage2Story(level);
+        break;
+      case 3:
+      default:
+        playStage3Story(level);
+    }
   });
 
 // 뒤로가기
@@ -396,7 +392,6 @@ let score = 0;
 let timer = null;
 let timeLeft = 300; // 5분 = 300초
 let lives = 5; // 목숨
-let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
 let sfxEnabled = true;
 let itemEnabled = true;
 let isPaddleWidened = false;
