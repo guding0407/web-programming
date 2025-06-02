@@ -1046,3 +1046,34 @@ $("#btn-exit").click(function () {
   if (window.animId) cancelAnimationFrame(window.animId);
   if (timer) clearInterval(timer);
 });
+
+$("#btn-hall").click(function () {
+  showHallOfFame();
+});
+
+$("#btn-clear-yes").click(function () {
+  $("#game-clear-modal").hide();
+  $("#register-score-modal").show();
+  $("#initials-input").val("").focus();
+});
+
+$("#btn-register-score")
+  .off("click")
+  .on("click", function () {
+    // 1) 입력값 정리
+    const init = $("#initials-input").val().trim().toUpperCase();
+
+    // 2) 유효성 검사 : 영문·숫자 3글자
+    if (!/^[A-Z0-9]{3}$/.test(init)) {
+      alert("이니셜은 영문/숫자 3글자로 입력하세요!");
+      $("#initials-input").focus();
+      return;
+    }
+
+    // 3) 점수 저장 → showHallOfFame() 호출
+    registerScore(init);
+
+    // 4) 입력창 / 모달 정리
+    $("#initials-input").val("");
+    $("#register-score-modal").hide();
+  });
