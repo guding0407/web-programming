@@ -581,7 +581,7 @@ function initGame(config, level, twoPlayerMode) {
         ) {
           ball.dy = -Math.abs(ball.dy);
           audioAssets.paddleBounce.currentTime = 0;
-          audioAssets.paddleBounce.play();
+          if (sfxEnabled) audioAssets.paddleBounce.play();
           let hit =
             (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
           ball.dx += hit;
@@ -626,7 +626,7 @@ function initGame(config, level, twoPlayerMode) {
         ) {
           b.hp--;
           audioAssets.brickHit.currentTime = 0;
-          audioAssets.brickHit.play();
+          if (sfxEnabled) audioAssets.brickHit.play();
           score += 100;
           ball.dy = -ball.dy;
 
@@ -644,7 +644,7 @@ function initGame(config, level, twoPlayerMode) {
             const type = types[Math.floor(Math.random() * types.length)];
             spawnItem(type, b.x + b.width / 2, b.y + b.height);
             audioAssets.itemSpawn.currentTime = 0;
-            audioAssets.itemSpawn.play();
+            if (sfxEnabled) audioAssets.itemSpawn.play();
           }
           break;
         }
