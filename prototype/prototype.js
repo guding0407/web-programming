@@ -445,6 +445,13 @@ function initGame(config, level, twoPlayerMode) {
   $(document)
     .on("keydown", function (e) {
       if (e.key === "Escape") {
+        if (
+          $("#register-score-modal").is(":visible") ||
+          $("#game-clear-modal").is(":visible") ||
+          $("#game-over-modal").is(":visible")
+        ) {
+          return; // 모달이 열려있으면 무시
+        }
         if (!isPaused) pauseGame();
       }
       if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
@@ -737,26 +744,15 @@ function initGame(config, level, twoPlayerMode) {
       let clearTimeSec = Math.floor(clearTime % 60);
       let timeLeftMin = Math.floor(timeLeft / 60);
       let timeLeftSec = Math.floor(timeLeft % 60);
-      let str =
-        "클리어 시간 : " +
-        clearTimeMin +
-        "분 " +
-        clearTimeSec +
-        "초" +
-        "<br>" +
-        "남은 시간 : " +
-        timeLeftMin +
-        "분 " +
-        timeLeftSec +
-        "초" +
-        "<br>" +
-        "최종 점수: " +
-        score +
-        "점";
+      let str1 = "클리어 시간 : " + clearTimeMin + "분 " + clearTimeSec + "초";
+      let str2 = "남은 시간 : " + timeLeftMin + "분 " + timeLeftSec + "초";
+      let str3 = "최종 점수: " + score + "점";
 
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
-      $("#clear-score-text").text("최종 점수: " + score + "점");
+      $("#clear-score-text").append();
+      $("#clear-score-text").append(str2);
+      $("#clear-score-text").append(str3);
       return;
     }
 
