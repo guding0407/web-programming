@@ -4,14 +4,93 @@ $(document).ready(function () {
   $("#intro").show();
 });
 
-$("#intro").click(function () {
-  $(this).fadeOut(2000);
-  $("#main-menu").show();
-  // 배경음악 시작
-  if (localStorage.getItem("setting_bgm") !== "false") {
-    bgmAudio.play();
-  }
+let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
+
+const bgmAsset = new Audio("assets/audio/bgm.mp3");
+bgmAudio = bgmAsset; // 기본 배경음악 설정
+bgmAudio.volume = volume; // 초기 볼륨 설정
+
+// 클릭 → 인트로 사라지고 스타트 시나리오 재생
+$("#intro").on("click", function () {
+  const $intro = $(this);
+  $intro.fadeOut(800, () => {
+    $("#start-story").fadeIn(400, playStartStory);
+  });
 });
+
+// 스타트 시나리오
+const START_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_start/scene1.png",
+    text:
+      "2178년, 데이터 전송망 지하에서<br>" +
+      "정체불명의 바이러스 감염이 시작되었다…",
+  },
+  {
+    img: "assets/img/scenario_start/scene2.png",
+    text: "도시는 멈췄고,<br>" + "단 한 명의 복구 요원이 호출되었다.",
+  },
+  {
+    img: "assets/img/scenario_start/scene3.png",
+    text:
+      'AI 바이러스 <span style="color:#ff3040">"GLITCH"</span>를 격파하고<br>' +
+      "시스템을 복구하라!",
+  },
+];
+
+// 스토리 플레이이
+function playStory(scenes, $overlay, onFinish) {
+  const $img = $overlay.find("img");
+  const $txt = $overlay.find("p");
+  const $skip = $overlay.find(".skip-btn").show(); // 버튼 표시
+
+  let idx = 0,
+    fadeT = null,
+    holdT = null;
+
+  function next() {
+    if (idx >= scenes.length) {
+      $skip.hide(); // 버튼 숨김 (재사용 대비)
+      $overlay.fadeOut(600, onFinish); // 다음 단계 콜백
+      return;
+    }
+    // 현재 컷 세팅
+    const s = scenes[idx++];
+    $img.attr("src", s.img);
+    $txt.html(s.text);
+
+    $img.add($txt).addClass("fade-in");
+
+    // [fade-in 0.8s] + [정지 1.9s] + [fade-out 0.8s]
+    fadeT = setTimeout(() => {
+      // 1.9s 뒤
+      $img.add($txt).removeClass("fade-in").addClass("fade-out");
+      holdT = setTimeout(() => {
+        // fade-out 종료
+        $img.add($txt).removeClass("fade-out"); // 클래스 리셋
+        next(); // 다음 컷 재귀
+      }, 800); // fade-out 시간
+    }, 800 + 1900); // fade-in 0.8s + 정지 1.9s
+  }
+
+  /* Skip : 타이머 제거 → idx를 끝으로 → next() */
+  $skip.one("click", () => {
+    clearTimeout(fadeT);
+    clearTimeout(holdT);
+    idx = scenes.length;
+    next();
+  });
+
+  /* overlay 켜고 재생 시작 */
+  $overlay.fadeIn(400, next);
+}
+
+function playStartStory() {
+  playStory(START_STORY_SCENES, $("#start-story"), () => {
+    $("#main-menu").show();
+    if (localStorage.getItem("setting_bgm") !== "false") bgmAudio.play();
+  });
+}
 
 // main-menu와 난이도 메뉴 전환
 $("#btn-start").click(function () {
@@ -19,7 +98,8 @@ $("#btn-start").click(function () {
   $("#difficulty-menu").show();
 });
 
-// 시나리오 버튼 클릭
+// 1. 시나리오 설명에서 사용할 함수
+// 시나리오 이전 버튼
 $("#prev_scenario").click(function () {
   const scenarios = $(".scenario-content");
   if (currentScenario < scenarios.length - 1) {
@@ -27,18 +107,144 @@ $("#prev_scenario").click(function () {
     updateScenarioView();
   }
 });
-
+// 시나리오 다음 버튼
 $("#next_scenario").click(function () {
   if (currentScenario > 0) {
     currentScenario--;
     updateScenarioView();
   }
 });
-// 난이도 버튼 클릭
-$(".btn-difficulty").click(function () {
-  const level = $(this).data("level");
-  startGame(level); // 여기서 level(1/2/3)만 넘기면 됨
+
+// Stage 1 시나리오
+const STAGE1_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_level1/scene1.png",
+    text:
+      "데이터 전송망 하층부로 진입 중…<br>" +
+      "전송률 0.2%. <strong>중앙 회선 손상</strong> 확인.",
+  },
+  {
+    img: "assets/img/scenario_level1/scene2.png",
+    text:
+      "바이러스 잔류 파형 감지.<br>" +
+      '<span style="color:#ff3a4a">GLITCH</span> 프래그먼트가 회로를 잠식 중…',
+  },
+  {
+    img: "assets/img/scenario_level1/scene3.png",
+    text:
+      "COREBALL 부트 완료.<br>" +
+      "벽돌(데이터 블록)을 파괴하여<br>전송 경로를 확보하라!",
+  },
+];
+
+function playStage1Story(level) {
+  playStory(STAGE1_STORY_SCENES, $("#stage1-story"), () => startGame(level));
+}
+
+// Stage 2 시나리오
+const STAGE2_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_level2/scene1.png",
+    text:
+      "중추 서버 코어 상태 이상 감지!<br>" +
+      "전송률 14% - 데이터 흐름 불안정...",
+  },
+  {
+    img: "assets/img/scenario_level2/scene2.png",
+    text:
+      "보안 모듈 감염 확산!<br>" +
+      '<span style="color:#ff3a4a">GLITCH 분열체</span>가 방어 알고리즘을 재작성 중…',
+  },
+  {
+    img: "assets/img/scenario_level2/scene3.png",
+    text:
+      "COREBALL 오버라이트 준비 완료.<br>" +
+      "보안 장벽을 해제하고 데이터 흐름을 정상화하라!",
+  },
+];
+
+function playStage2Story(level) {
+  playStory(STAGE2_STORY_SCENES, $("#stage2-story"), () => startGame(level));
+}
+
+// Stage 3 시나리오
+const STAGE3_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_level3/scene1.png",
+    text:
+      "제어탑 최상층 도달!<br>시스템 루트 접근 승인..." +
+      '<strong style="color:#ff3a4a">GLITCH CORE</strong> 검출.',
+  },
+  {
+    img: "assets/img/scenario_level3/scene2.png",
+    text:
+      "<strong style='color:#ff3a4a'>GLITCH CORE</strong>가 <span style='color:#ff3a4a'>Self-Repair Loop</span> 가동 중!<br>" +
+      "도시 전체 잠식까지 <span style='color:#ffe062'>00 : 59</span>",
+  },
+  {
+    img: "assets/img/scenario_level3/scene3.png",
+    text: "오버라이트 에너지 100 % 충전!<br><strong>COREBALL을 투척해 루프를 차단하라!</strong>",
+  },
+];
+
+function playStage3Story(level) {
+  playStory(STAGE3_STORY_SCENES, $("#stage3-story"), () => startGame(level));
+}
+
+// 게임 설명
+$("#btn-howtoplay").click(function () {
+  $("#main-menu").hide();
+  $("#howtoplay-menu").show();
 });
+$("#btn-howtoplay-back").click(function () {
+  $("#howtoplay-menu").hide();
+  $("#main-menu").show();
+});
+
+// 시나리오 설명 열기
+$("#btn-scenario").click(function () {
+  $("#main-menu").hide();
+  $("#scenario-menu").show();
+});
+
+// 시나리오 설명 -> 메뉴로 돌아가기
+$("#btn-scenario-back").click(function () {
+  $("#scenario-menu").hide();
+  $("#main-menu").show();
+});
+
+// 시나리오 설명 -> 이전, 다음 버튼
+let currentScenario = 0;
+
+function updateScenarioView() {
+  const scenarios = $(".scenario-content");
+  scenarios.hide();
+  $(scenarios[currentScenario]).show();
+
+  $("#prev_scenario").prop(
+    "disabled",
+    currentScenario === scenarios.length - 1
+  );
+  $("#next_scenario").prop("disabled", currentScenario === 0);
+}
+
+// 난이도 버튼 클릭
+$(".btn-difficulty")
+  .off("click")
+  .on("click", function () {
+    const level = $(this).data("level"); // 1 · 2 · 3
+    switch (level) {
+      case 1:
+        playStage1Story(level);
+        break;
+      case 2:
+        playStage2Story(level);
+        break;
+      case 3:
+      default:
+        playStage3Story(level);
+    }
+  });
 
 // 뒤로가기
 $("#btn-difficulty-back").click(function () {
@@ -80,7 +286,6 @@ let score = 0;
 let timer = null;
 let timeLeft = 300; // 5분 = 300초
 let lives = 5; // 목숨
-let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
 let sfxEnabled = true;
 let itemEnabled = true;
 let isPaddleWidened = false;
@@ -96,16 +301,14 @@ let MAX_BALLS = 3; //공의 최대 개수
 let canvas = null;
 let context = null;
 
-const bgmAsset = new Audio("assets/audio/bgm.mp3");
-bgmAudio = bgmAsset; // 기본 배경음악 설정
-bgmAudio.volume = volume; // 초기 볼륨 설정
-
+// 게임 화면 효과음은 객체로 관리
 const audioAssets = {
   brickHit: new Audio("assets/audio/brick_hit.mp3"),
   itemSpawn: new Audio("assets/audio/item_spawn.mp3"),
   paddleBounce: new Audio("assets/audio/paddle_bounce.mp3"),
 };
 
+// 게임 화면 구성 이미지는 객체로 관리
 const imageAssets = {
   ball: new Image(),
   paddle: [new Image(), new Image()],
@@ -120,6 +323,7 @@ imageAssets.blocks[0].src = "assets/img/level_1_block_64bit.png";
 imageAssets.blocks[1].src = "assets/img/level_2_block_64bit.png";
 imageAssets.blocks[2].src = "assets/img/level_3_block_64bit.png";
 
+// 게임 시작 함수
 function startGame(level) {
   const config = GAME_LEVELS[level];
   score = 0;
@@ -138,6 +342,7 @@ function startGame(level) {
   startTimer();
 }
 
+// 게임 화면 구현 함수
 function initGame(config, level, twoPlayerMode) {
   canvas = document.getElementById("game-canvas");
   context = canvas.getContext("2d");
@@ -240,6 +445,13 @@ function initGame(config, level, twoPlayerMode) {
   $(document)
     .on("keydown", function (e) {
       if (e.key === "Escape") {
+        if (
+          $("#register-score-modal").is(":visible") ||
+          $("#game-clear-modal").is(":visible") ||
+          $("#game-over-modal").is(":visible")
+        ) {
+          return; // 모달이 열려있으면 무시
+        }
         if (!isPaused) pauseGame();
       }
       if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
@@ -376,7 +588,7 @@ function initGame(config, level, twoPlayerMode) {
         ) {
           ball.dy = -Math.abs(ball.dy);
           audioAssets.paddleBounce.currentTime = 0;
-          audioAssets.paddleBounce.play();
+          if (sfxEnabled) audioAssets.paddleBounce.play();
           let hit =
             (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
           ball.dx += hit;
@@ -421,7 +633,7 @@ function initGame(config, level, twoPlayerMode) {
         ) {
           b.hp--;
           audioAssets.brickHit.currentTime = 0;
-          audioAssets.brickHit.play();
+          if (sfxEnabled) audioAssets.brickHit.play();
           score += 100;
           ball.dy = -ball.dy;
 
@@ -439,7 +651,7 @@ function initGame(config, level, twoPlayerMode) {
             const type = types[Math.floor(Math.random() * types.length)];
             spawnItem(type, b.x + b.width / 2, b.y + b.height);
             audioAssets.itemSpawn.currentTime = 0;
-            audioAssets.itemSpawn.play();
+            if (sfxEnabled) audioAssets.itemSpawn.play();
           }
           break;
         }
@@ -532,26 +744,15 @@ function initGame(config, level, twoPlayerMode) {
       let clearTimeSec = Math.floor(clearTime % 60);
       let timeLeftMin = Math.floor(timeLeft / 60);
       let timeLeftSec = Math.floor(timeLeft % 60);
-      let str =
-        "클리어 시간 : " +
-        clearTimeMin +
-        "분 " +
-        clearTimeSec +
-        "초" +
-        "<br>" +
-        "남은 시간 : " +
-        timeLeftMin +
-        "분 " +
-        timeLeftSec +
-        "초" +
-        "<br>" +
-        "최종 점수: " +
-        score +
-        "점";
+      let str1 = "클리어 시간 : " + clearTimeMin + "분 " + clearTimeSec + "초";
+      let str2 = "남은 시간 : " + timeLeftMin + "분 " + timeLeftSec + "초";
+      let str3 = "최종 점수: " + score + "점";
 
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
-      $("#clear-score-text").text("최종 점수: " + score + "점");
+      $("#clear-score-text").append();
+      $("#clear-score-text").append(str2);
+      $("#clear-score-text").append(str3);
       return;
     }
 
@@ -585,15 +786,7 @@ function onBrickBroken() {
   }
 }
 
-// 벽돌 색상
-function getBrickColor(b) {
-  const ratio = b.hp / b.maxHp;
-  if (ratio > 0.66) return "#ffc542";
-  else if (ratio > 0.33) return "#ff9442";
-  return "#ff5555";
-}
-
-// 단일 효 적용 유틸
+// 효과 적용 함수
 function applyEffect(paddle, type, duration) {
   // 1) 이전 효과 제거
   if (paddle.revertFn) paddle.revertFn();
@@ -639,20 +832,6 @@ function applyEffect(paddle, type, duration) {
       };
       break;
     }
-    /*case "ball-slow": {
-      // 모든 공 속도 절반
-      const saved = balls.map((b) => ({ b, dx: b.dx, dy: b.dy }));
-      balls.forEach((b) => {
-        b.dx *= 0.5;
-        b.dy *= 0.5;
-      });
-      paddle.revertFn = () =>
-        saved.forEach(({ b, dx, dy }) => {
-          b.dx = dx;
-          b.dy = dy;
-        });
-      break;
-    }*/
   }
 
   // 3) 메타데이터 업데이트
@@ -684,33 +863,7 @@ function getEffectLabel(effect) {
   }
 }
 
-// 설정값 저장 및 반영 구현
-function loadSettings() {
-  const bgm = localStorage.getItem("setting_bgm");
-  const sfx = localStorage.getItem("setting_sfx");
-  const vol = parseInt(localStorage.getItem("setting_volume") || "100");
-  const item = localStorage.getItem("setting_item");
-
-  $("#volume-range").val(vol);
-  volume = vol / 100;
-  bgmAudio.volume = volume;
-
-  $("#bgm-toggle").prop("checked", bgm !== "false");
-  $("#sfx-toggle").prop("checked", sfx !== "false");
-  $("#item-toggle").prop("checked", item !== "false");
-
-  const twoPlayer = localStorage.getItem("setting_two_player");
-  $("#two-player-toggle").prop("checked", twoPlayer === "true");
-
-  if (bgm !== "false") {
-    bgmAudio.play();
-  } else {
-    bgmAudio.pause();
-  }
-
-  sfxEnabled = sfx !== "false";
-  itemEnabled = item !== "false";
-}
+// 3.게임 설정
 
 // 체크박스 이벤트 연결
 $("#bgm-toggle").change(function () {
@@ -762,6 +915,40 @@ $("#volume-range").on("input", function () {
   localStorage.setItem("setting_volume", Math.floor(vol * 100));
   volume = vol;
   bgmAudio.volume = volume;
+});
+
+// 설정값 저장 및 반영 구현
+function loadSettings() {
+  const bgm = localStorage.getItem("setting_bgm");
+  const sfx = localStorage.getItem("setting_sfx");
+  const vol = parseInt(localStorage.getItem("setting_volume") || "100");
+  const item = localStorage.getItem("setting_item");
+
+  $("#volume-range").val(vol);
+  volume = vol / 100;
+  bgmAudio.volume = volume;
+
+  $("#bgm-toggle").prop("checked", bgm !== "false");
+  $("#sfx-toggle").prop("checked", sfx !== "false");
+  $("#item-toggle").prop("checked", item !== "false");
+
+  const twoPlayer = localStorage.getItem("setting_two_player");
+  $("#two-player-toggle").prop("checked", twoPlayer === "true");
+
+  if (bgm !== "false") {
+    bgmAudio.play();
+  } else {
+    bgmAudio.pause();
+  }
+
+  sfxEnabled = sfx !== "false";
+  itemEnabled = item !== "false";
+}
+
+// 뒤로가기 이벤트
+$("#btn-option-back").click(function () {
+  $("#option-menu").hide();
+  $("#main-menu").show();
 });
 
 // 게임 클리어 시 명예의 전당에 등록하지 않을 때
@@ -839,7 +1026,7 @@ $("#btn-option").click(function () {
   $("#option-menu").show();
 });
 
-// 일시중단
+// 2.6 일시정지 모달
 $("#btn-resume").click(function () {
   isPaused = false;
   $("#pause-modal").hide();
@@ -856,47 +1043,33 @@ $("#btn-exit").click(function () {
   if (timer) clearInterval(timer);
 });
 
-// 뒤로가기 버튼 처리
-$("#btn-option-back").click(function () {
-  $("#option-menu").hide();
-  $("#main-menu").show();
+$("#btn-hall").click(function () {
+  showHallOfFame();
 });
 
-// 게임 설명
-$("#btn-howtoplay").click(function () {
-  $("#main-menu").hide();
-  $("#howtoplay-menu").show();
-});
-$("#btn-howtoplay-back").click(function () {
-  $("#howtoplay-menu").hide();
-  $("#main-menu").show();
+$("#btn-clear-yes").click(function () {
+  $("#game-clear-modal").hide();
+  $("#register-score-modal").show();
+  $("#initials-input").val("").focus();
 });
 
-// 시나리오 설명 열기
-$("#btn-scenario").click(function () {
-  $("#main-menu").hide();
-  $("#scenario-menu").show();
-});
+$("#btn-register-score")
+  .off("click")
+  .on("click", function () {
+    // 1) 입력값 정리
+    const init = $("#initials-input").val().trim().toUpperCase();
 
-// 시나리오 설명 → 메뉴로 돌아가기
-$("#btn-scenario-back").click(function () {
-  $("#scenario-menu").hide();
-  $("#main-menu").show();
-});
+    // 2) 유효성 검사 : 영문·숫자 3글자
+    if (!/^[A-Z0-9]{3}$/.test(init)) {
+      alert("이니셜은 영문/숫자 3글자로 입력하세요!");
+      $("#initials-input").focus();
+      return;
+    }
 
-// 시나리오 설명 페이지 네비게이션
-let currentScenario = 0;
+    // 3) 점수 저장 → showHallOfFame() 호출
+    registerScore(init);
 
-function updateScenarioView() {
-  const scenarios = $(".scenario-content");
-  scenarios.hide();
-  $(scenarios[currentScenario]).show();
-
-  // prev_scenario: next
-  // next_scenario: prev
-  $("#prev_scenario").prop(
-    "disabled",
-    currentScenario === scenarios.length - 1
-  );
-  $("#next_scenario").prop("disabled", currentScenario === 0);
-}
+    // 4) 입력창 / 모달 정리
+    $("#initials-input").val("");
+    $("#register-score-modal").hide();
+  });

@@ -185,6 +185,17 @@ body {
   box-shadow: 0 2px 12px #21f4fa66;
 }
 
+#difficulty-menu .btn-difficulty {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#difficulty-menu .difficulty-container {
+  width: 27%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 #difficulty-menu,
 #game-screen,
 #hall-of-fame,
@@ -249,6 +260,7 @@ button:hover {
   height: 100vh;
   max-width: 500px;
   max-height: 700px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -258,13 +270,25 @@ button:hover {
 .scenario-image {
   max-width: 100%;
   height: auto;
-  margin-bottom: 16px;
   border-radius: 15px;
 }
 
-#scenario-btn {
-  margin-bottom: 0;
+#scenario-btn-container > button {
+  width: 100px;
+  height: 40px;
+  line-height: 40px;
+  margin: 0;
+  padding: 0;
+  background: #32d1ff;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s, opacity 0.3s ease;
+  box-shadow: 0 2px 8px #1b2b42ad;
+  font-weight: 700;
 }
+
 #timer,
 #score {
   font-size: 1.4rem;
@@ -599,6 +623,12 @@ input#initials-input {
   border-radius: 16px;
 }
 
+#pause-modal .pause-buttons {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
 #pause-modal h2 {
   color: #ffe062;
   font-size: 2rem;
@@ -645,7 +675,8 @@ input#initials-input {
 #scenario-menu h2 {
   color: #3df4fa;
   font-size: 2rem;
-  margin-bottom: 30px;
+  margin-top: 50px;
+
   text-align: center;
   text-shadow: 0 0 10px #21f4fa;
 }
@@ -673,11 +704,170 @@ input#initials-input {
   color: #fff;
   border-radius: 12px;
   margin-top: 16px;
+  margin-bottom: 30px;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.18s;
 }
 
 #btn-scenario-back:hover {
+  background: #f3237d;
+}
+
+#start-story {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  z-index: 1100;
+  overflow: hidden;
+}
+
+.story-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+}
+
+#story-image {
+  max-width: 80vw;
+  max-height: 60vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#story-text {
+  max-width: 800px;
+  padding: 0 24px;
+  font-size: 1.55rem;
+  line-height: 1.6;
+  color: #fff;
+  text-shadow: 0 0 8px #c22;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#stage1-story {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  z-index: 1100;
+  overflow: hidden;
+}
+
+#stage1-image {
+  max-width: 80vw;
+  max-height: 60vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#stage1-text {
+  max-width: 800px;
+  padding: 0 24px;
+  font-size: 1.55rem;
+  line-height: 1.6;
+  color: #fff;
+  text-shadow: 0 0 8px #c22;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#stage2-story {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  z-index: 1100;
+  overflow: hidden;
+}
+
+#stage2-image {
+  max-width: 80vw;
+  max-height: 60vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#stage2-text {
+  max-width: 800px;
+  padding: 0 24px;
+  font-size: 1.55rem;
+  line-height: 1.6;
+  color: #fff;
+  text-shadow: 0 0 8px #c22;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#stage3-story {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  z-index: 1100;
+  overflow: hidden;
+}
+
+#stage3-image {
+  max-width: 80vw;
+  max-height: 60vh;
+  object-fit: contain;
+  image-rendering: pixelated;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#stage3-text {
+  max-width: 800px;
+  padding: 0 24px;
+  font-size: 1.55rem;
+  line-height: 1.6;
+  color: #fff;
+  text-shadow: 0 0 8px #c22;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.fade-in {
+  opacity: 1 !important;
+}
+.fade-out {
+  opacity: 0 !important;
+}
+
+.skip-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1200;
+  padding: 10px 22px;
+  font: 600 1.1rem Pretendard;
+  background: #ff68ba;
+  border: 2px solid #c542ff;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #f3237d66;
+  transition: background 0.2s;
+}
+
+.skip-btn:hover {
   background: #f3237d;
 }
