@@ -871,3 +871,10 @@ input#initials-input {
 .skip-btn:hover {
   background: #f3237d;
 }
+
+.digit-img {
+  width: 24px;
+  height: auto;
+  image-rendering: pixelated;
+  vertical-align: middle;
+}

@@ -10,6 +10,50 @@ const bgmAsset = new Audio("assets/audio/bgm.mp3");
 bgmAudio = bgmAsset; // 기본 배경음악 설정
 bgmAudio.volume = volume; // 초기 볼륨 설정
 
+//번호 이미지로 표기 함수
+function renderNumberWithImages(number, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  const str = number.toString();
+  for (let i = 0; i < str.length; i++) {
+    const digit = str[i];
+    if (digit >= "0" && digit <= "9") {
+      const img = document.createElement("img");
+      img.src = `assets/img/${digit}_8bit.png`;
+      img.className = "digit-img";
+      img.alt = digit;
+      container.appendChild(img);
+    }
+  }
+}
+
+function renderTimeWithImages(sec, containerId) {
+  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const s = (sec % 60).toString().padStart(2, "0");
+  const timeStr = `${m}:${s}`;
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  for (let i = 0; i < timeStr.length; i++) {
+    const ch = timeStr[i];
+    if (ch === ":") {
+      const span = document.createElement("span");
+      span.textContent = ":";
+      span.style.margin = "0 4px";
+      span.style.color = "#f7d84a";
+      span.style.fontWeight = "bold";
+      container.appendChild(span);
+    } else {
+      const img = document.createElement("img");
+      img.src = `assets/img/${ch}_8bit.png`;
+      img.className = "digit-img";
+      img.alt = ch;
+      container.appendChild(img);
+    }
+  }
+}
+
 // 클릭 → 인트로 사라지고 스타트 시나리오 재생
 $("#intro").on("click", function () {
   const $intro = $(this);
@@ -516,8 +560,8 @@ function initGame(config, level, twoPlayerMode) {
     }
 
     // 점수, 타이머 표시
-    $("#score-value").text(score);
-
+    //$("#score-value").text(score); 이미지로 숫자 출력하면서 비활성화
+    renderNumberWithImages(score, "score-value");
     // 패들 이동
     // 플레이어 1 이동
     const paddle = paddles[0];
@@ -763,10 +807,12 @@ function initGame(config, level, twoPlayerMode) {
 
 // 타이머 시작/갱신
 function startTimer() {
-  $("#timer").text(formatTime(timeLeft));
+  //$("#timer").text(formatTime(timeLeft)); 이미지로 숫자 출력하면서 비활성화
+  renderTimeWithImages(timeLeft, "timer");
   timer = setInterval(function () {
     timeLeft--;
-    $("#timer").text(formatTime(timeLeft));
+    //$("#timer").text(formatTime(timeLeft)); 이미지로 숫자 출력하면서 비활성화
+    renderTimeWithImages(timeLeft, "timer");
     if (timeLeft <= 0) {
       clearInterval(timer);
       gameOver(false); // 실패
@@ -1073,3 +1119,4 @@ $("#btn-register-score")
     $("#initials-input").val("");
     $("#register-score-modal").hide();
   });
+
