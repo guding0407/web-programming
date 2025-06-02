@@ -4,14 +4,269 @@ $(document).ready(function () {
   $("#intro").show();
 });
 
-$("#intro").click(function () {
-  $(this).fadeOut(2000);
-  $("#main-menu").show();
-  // 배경음악 시작
-  if (localStorage.getItem("setting_bgm") !== "false") {
-    bgmAudio.play();
-  }
+// 스타트 시나리오
+const START_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_start/scene1.png",
+    text:
+      "2178년, 데이터 전송망 지하에서<br>" +
+      "정체불명의 바이러스 감염이 시작되었다…",
+  },
+  {
+    img: "assets/img/scenario_start/scene2.png",
+    text: "도시는 멈췄고,<br>" + "단 한 명의 복구 요원이 호출되었다.",
+  },
+  {
+    img: "assets/img/scenario_start/scene3.png",
+    text:
+      'AI 바이러스 <span style="color:#ff3040">"GLITCH"</span>를 격파하고<br>' +
+      "시스템을 복구하라!",
+  },
+];
+
+// 클릭 → 인트로 사라지고 스타트 시나리오 재생
+$("#intro").on("click", function () {
+  const $intro = $(this);
+  $intro.fadeOut(800, () => {
+    $("#start-story").fadeIn(400, playStartStory);
+  });
 });
+
+// 시나리오 재생 함수
+function playStartStory() {
+  const $overlay = $("#start-story");
+  const $img = $("#story-image");
+  const $txt = $("#story-text");
+
+  let idx = 0;
+  const FADE_DURATION = 800; // ms
+  const SHOW_DURATION = 3000; // “완전히 보이는” 시간
+
+  function showScene() {
+    if (idx >= START_STORY_SCENES.length) {
+      // 모든 컷 끝 → 오버레이 닫고 메인 메뉴
+      $overlay.fadeOut(600, () => {
+        $("#main-menu").show();
+        if (localStorage.getItem("setting_bgm") !== "false") bgmAudio.play();
+      });
+      return;
+    }
+
+    // 현재 컷 세팅
+    const scene = START_STORY_SCENES[idx];
+    $img.attr("src", scene.img);
+    $txt.html(scene.text);
+
+    // fade-in
+    $img.addClass("fade-in");
+    $txt.addClass("fade-in");
+
+    /*  타이밍 :
+        [fade-in 0.8s] → [정지 1.9s] → [fade-out 0.8s] */
+    setTimeout(() => {
+      // fade-out
+      $img.removeClass("fade-in").addClass("fade-out");
+      $txt.removeClass("fade-in").addClass("fade-out");
+
+      setTimeout(() => {
+        // 클래스 리셋 후 다음 컷
+        $img.removeClass("fade-out");
+        $txt.removeClass("fade-out");
+        idx += 1;
+        showScene();
+      }, FADE_DURATION); // 끝난 뒤 next
+    }, FADE_DURATION + SHOW_DURATION);
+  }
+
+  showScene();
+}
+
+// Stage 1 시나리오
+const STAGE1_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_level1/scene1.png",
+    text:
+      "데이터 전송망 하층부로 진입 중…<br>" +
+      "전송률 0.2%. <strong>중앙 회선 손상</strong> 확인.",
+  },
+  {
+    img: "assets/img/scenario_level1/scene2.png",
+    text:
+      "바이러스 잔류 파형 감지.<br>" +
+      '<span style="color:#ff3a4a">GLITCH</span> 프래그먼트가 회로를 잠식 중…',
+  },
+  {
+    img: "assets/img/scenario_level1/scene3.png",
+    text:
+      "COREBALL 부트 완료.<br>" +
+      "벽돌(데이터 블록)을 파괴하여<br>전송 경로를 확보하라!",
+  },
+];
+
+function playStage1Story(level) {
+  const $ov = $("#stage1-story");
+  const $img = $("#stage1-image");
+  const $txt = $("#stage1-text");
+
+  let i = 0;
+  const F = 800; // fade ms
+  const S = 3000; // 정지 ms
+
+  function next() {
+    if (i >= STAGE1_STORY_SCENES.length) {
+      // 끝 → 오버레이 닫고 게임 시작
+      $ov.fadeOut(600, () => startGame(level));
+      return;
+    }
+
+    const s = STAGE1_STORY_SCENES[i];
+    $img.attr("src", s.img);
+    $txt.html(s.text);
+
+    $img.addClass("fade-in");
+    $txt.addClass("fade-in");
+
+    setTimeout(() => {
+      $img.removeClass("fade-in").addClass("fade-out");
+      $txt.removeClass("fade-in").addClass("fade-out");
+
+      setTimeout(() => {
+        $img.removeClass("fade-out");
+        $txt.removeClass("fade-out");
+        i += 1;
+        next();
+      }, F);
+    }, F + S);
+  }
+
+  // 오버레이 표시 & 시작
+  $("#difficulty-menu").hide();
+  $ov.fadeIn(400, next);
+}
+
+// Stage 2 시나리오
+const STAGE2_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_level2/scene1.png",
+    text:
+      "중추 서버 코어 상태 이상 감지!<br>" +
+      "전송률 14% - 데이터 흐름 불안정...",
+  },
+  {
+    img: "assets/img/scenario_level2/scene2.png",
+    text:
+      "보안 모듈 감염 확산!<br>" +
+      '<span style="color:#ff3a4a">GLITCH 분열체</span>가 방어 알고리즘을 재작성 중…',
+  },
+  {
+    img: "assets/img/scenario_level2/scene3.png",
+    text:
+      "COREBALL 오버라이트 준비 완료.<br>" +
+      "보안 장벽을 해제하고 데이터 흐름을 정상화하라!",
+  },
+];
+
+function playStage2Story(level) {
+  const $ov = $("#stage2-story");
+  const $img = $("#stage2-image");
+  const $txt = $("#stage2-text");
+
+  let i = 0;
+  const F = 800; // fade ms
+  const S = 3000; // 정지 ms
+
+  function next() {
+    if (i >= STAGE2_STORY_SCENES.length) {
+      // 끝 → 오버레이 닫고 게임 시작
+      $ov.fadeOut(600, () => startGame(level));
+      return;
+    }
+
+    const s = STAGE2_STORY_SCENES[i];
+    $img.attr("src", s.img);
+    $txt.html(s.text);
+
+    $img.addClass("fade-in");
+    $txt.addClass("fade-in");
+
+    setTimeout(() => {
+      $img.removeClass("fade-in").addClass("fade-out");
+      $txt.removeClass("fade-in").addClass("fade-out");
+
+      setTimeout(() => {
+        $img.removeClass("fade-out");
+        $txt.removeClass("fade-out");
+        i += 1;
+        next();
+      }, F);
+    }, F + S);
+  }
+
+  // 오버레이 표시 & 시작
+  $("#difficulty-menu").hide();
+  $ov.fadeIn(400, next);
+}
+
+// Stage 3 시나리오
+const STAGE3_STORY_SCENES = [
+  {
+    img: "assets/img/scenario_level3/scene1.png",
+    text:
+      "제어탑 최상층 도달!<br>시스템 루트 접근 승인..." +
+      '<strong style="color:#ff3a4a">GLITCH CORE</strong> 검출.',
+  },
+  {
+    img: "assets/img/scenario_level3/scene2.png",
+    text:
+      "<strong style='color:#ff3a4a'>GLITCH CORE</strong>가 <span style='color:#ff3a4a'>Self-Repair Loop</span> 가동 중!<br>" +
+      "도시 전체 잠식까지 <span style='color:#ffe062'>00 : 59</span>",
+  },
+  {
+    img: "assets/img/scenario_level3/scene3.png",
+    text: "오버라이트 에너지 100 % 충전!<br><strong>COREBALL을 투척해 루프를 차단하라!</strong>",
+  },
+];
+
+function playStage3Story(level) {
+  const $ov = $("#stage3-story");
+  const $img = $("#stage3-image");
+  const $txt = $("#stage3-text");
+
+  let i = 0;
+  const F = 800; // fade ms
+  const S = 3000; // 정지 ms
+
+  function next() {
+    if (i >= STAGE3_STORY_SCENES.length) {
+      // 끝 → 오버레이 닫고 게임 시작
+      $ov.fadeOut(600, () => startGame(level));
+      return;
+    }
+
+    const s = STAGE3_STORY_SCENES[i];
+    $img.attr("src", s.img);
+    $txt.html(s.text);
+
+    $img.addClass("fade-in");
+    $txt.addClass("fade-in");
+
+    setTimeout(() => {
+      $img.removeClass("fade-in").addClass("fade-out");
+      $txt.removeClass("fade-in").addClass("fade-out");
+
+      setTimeout(() => {
+        $img.removeClass("fade-out");
+        $txt.removeClass("fade-out");
+        i += 1;
+        next();
+      }, F);
+    }, F + S);
+  }
+
+  // 오버레이 표시 & 시작
+  $("#difficulty-menu").hide();
+  $ov.fadeIn(400, next);
+}
 
 // main-menu와 난이도 메뉴 전환
 $("#btn-start").click(function () {
@@ -34,11 +289,30 @@ $("#next_scenario").click(function () {
     updateScenarioView();
   }
 });
-// 난이도 버튼 클릭
-$(".btn-difficulty").click(function () {
-  const level = $(this).data("level");
-  startGame(level); // 여기서 level(1/2/3)만 넘기면 됨
-});
+
+// 난이도 버튼 클릭 → Stage1 스토리 → 게임
+$(".btn-difficulty")
+  .off("click")
+  .on("click", function () {
+    const level = $(this).data("level");
+    playStage1Story(level);
+  });
+
+// 난이도 버튼 클릭 → Stage2 스토리 → 게임
+$(".btn-difficulty")
+  .off("click")
+  .on("click", function () {
+    const level = $(this).data("level");
+    playStage2Story(level);
+  });
+
+// 난이도 버튼 클릭 → Stage3 스토리 → 게임
+$(".btn-difficulty")
+  .off("click")
+  .on("click", function () {
+    const level = $(this).data("level");
+    playStage3Story(level);
+  });
 
 // 뒤로가기
 $("#btn-difficulty-back").click(function () {
