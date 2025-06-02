@@ -185,6 +185,17 @@ body {
   box-shadow: 0 2px 12px #21f4fa66;
 }
 
+#difficulty-menu .btn-difficulty {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#difficulty-menu .difficulty-container {
+  width: 27%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 #difficulty-menu,
 #game-screen,
 #hall-of-fame,
@@ -610,6 +621,12 @@ input#initials-input {
   justify-content: center;
   align-items: center;
   border-radius: 16px;
+}
+
+#pause-modal .pause-buttons {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
 }
 
 #pause-modal h2 {
