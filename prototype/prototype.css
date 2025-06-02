@@ -835,3 +835,22 @@ input#initials-input {
 .fade-out {
   opacity: 0 !important;
 }
+
+.skip-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1200;
+  padding: 10px 22px;
+  font: 600 1.1rem Pretendard;
+  background: #ff68ba;
+  border: 2px solid #c542ff;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #f3237d66;
+  transition: background 0.2s;
+}
+
+.skip-btn:hover {
+  background: #f3237d;
+}
