@@ -29,7 +29,9 @@ function renderNumberWithImages(number, containerId) {
 }
 
 function renderTimeWithImages(sec, containerId) {
-  const m = Math.floor(sec / 60).toString().padStart(2, "0");
+  const m = Math.floor(sec / 60)
+    .toString()
+    .padStart(2, "0");
   const s = (sec % 60).toString().padStart(2, "0");
   const timeStr = `${m}:${s}`;
   const container = document.getElementById(containerId);
@@ -489,14 +491,9 @@ function initGame(config, level, twoPlayerMode) {
   $(document)
     .on("keydown", function (e) {
       if (e.key === "Escape") {
-        if (
-          $("#register-score-modal").is(":visible") ||
-          $("#game-clear-modal").is(":visible") ||
-          $("#game-over-modal").is(":visible")
-        ) {
-          return; // 모달이 열려있으면 무시
-        }
-        if (!isPaused) pauseGame();
+        if ($("#game-screen").is(":visible")) {
+          if (!isPaused) pauseGame();
+        } else return;
       }
       if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
       if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
@@ -1119,4 +1116,3 @@ $("#btn-register-score")
     $("#initials-input").val("");
     $("#register-score-modal").hide();
   });
-
