@@ -355,6 +355,44 @@ canvas#game-canvas {
   font-weight: bold;
 }
 
+#hall-of-fame h2 {
+  margin-bottom: 10px; /* 원래보다 작게 */
+}
+
+#hall-of-fame .mode-toggle {
+  margin-bottom: 12px; /* 버튼과 테이블 간격 축소 */
+}
+
+#hall-of-fame-table {
+  margin-top: 0; /* 혹시 기본 여백 있다면 제거 */
+}
+
+#hall-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+#hall-buttons button {
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #3df4fa;
+  background-color: #232847;
+  border: 1px solid #3df4fa66;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px #1b2b42aa;
+}
+
+#hall-buttons button:hover {
+  background-color: #2d354f;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px #21f4fa55;
+}
+
 input#initials-input {
   padding: 10px 20px;
   border-radius: 8px;
@@ -497,6 +535,7 @@ input#initials-input {
   margin-bottom: 8px;
   font-weight: bold;
   letter-spacing: 1.3px;
+  text-align: center;
 }
 #btn-clear-yes,
 #btn-clear-no {

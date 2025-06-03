@@ -7,6 +7,7 @@ $(document).ready(function () {
 let volume = parseInt(localStorage.getItem("setting_volume") || "100") / 100;
 
 const bgmAsset = new Audio("assets/audio/bgm.mp3");
+bgmAsset.loop = true;
 bgmAudio = bgmAsset; // 기본 배경음악 설정
 bgmAudio.volume = volume; // 초기 볼륨 설정
 
@@ -140,6 +141,18 @@ function playStartStory() {
 
 // main-menu와 난이도 메뉴 전환
 $("#btn-start").click(function () {
+
+  //bgm 에러 수정
+  const bgm = localStorage.getItem("setting_bgm");
+  if (bgm !== "false") {
+    bgmAudio.play().catch((err) => {
+      console.warn("BGM play error:", err);
+    });
+  } else {
+    bgmAudio.pause();
+  }
+
+
   $("#main-menu").hide();
   $("#difficulty-menu").show();
 });
@@ -346,6 +359,7 @@ let isPaused = false;
 let MAX_BALLS = 3; //공의 최대 개수
 let canvas = null;
 let context = null;
+let isTwoPlayerMode = false;
 
 // 게임 화면 효과음은 객체로 관리
 const audioAssets = {
@@ -372,6 +386,7 @@ imageAssets.blocks[2].src = "assets/img/level_3_block_64bit.png";
 // 게임 시작 함수
 function startGame(level) {
   const config = GAME_LEVELS[level];
+  isTwoPlayerMode = $("#two-player-toggle").is(":checked"); //2인 플레이 확인
   score = 0;
   timeLeft = 300;
   lives = 5;
@@ -680,7 +695,7 @@ function initGame(config, level, twoPlayerMode) {
 
           // 충돌 후 벽돌 이미지 변경: draw 루프에서 b.hp에 따라 자동 적용됨
 
-          if (itemEnabled && Math.random() < 0.9) {
+          if (itemEnabled && Math.random() < 0.2) {
             // 20% 확률로 아이템 생성
             const types = [
               "paddle-widen",
@@ -766,6 +781,9 @@ function initGame(config, level, twoPlayerMode) {
     if (bricks.every((b) => b.hp <= 0)) {
       cancelAnimationFrame(animId);
       clearInterval(timer);
+
+      let bonusMultiplier = isTwoPlayerMode ? 0.85 : 1; // 2인 모드일 땐 15% 감소
+
       let bonus = 0;
       switch (level) {
         case 1:
@@ -778,6 +796,7 @@ function initGame(config, level, twoPlayerMode) {
           bonus = timeLeft * 200;
           break;
       }
+      bonus = Math.floor(bonus * bonusMultiplier); // 보정된 보너스
       score += bonus;
 
       let clearTime = 300 - timeLeft;
@@ -791,8 +810,9 @@ function initGame(config, level, twoPlayerMode) {
 
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
-      $("#clear-score-text").append();
-      $("#clear-score-text").append(str2);
+      $("#clear-score-text").empty();  // ✅ 먼저 초기화
+      $("#clear-score-text").append(str1+"<br>");
+      $("#clear-score-text").append(str2+"<br>");
       $("#clear-score-text").append(str3);
       return;
     }
@@ -978,11 +998,11 @@ function loadSettings() {
   const twoPlayer = localStorage.getItem("setting_two_player");
   $("#two-player-toggle").prop("checked", twoPlayer === "true");
 
-  if (bgm !== "false") {
+/*  if (bgm !== "false") {
     bgmAudio.play();
   } else {
     bgmAudio.pause();
-  }
+  }*/
 
   sfxEnabled = sfx !== "false";
   itemEnabled = item !== "false";
@@ -1005,14 +1025,18 @@ $("#btn-clear-no").click(function () {
 
 // 명예의 전당 등록
 function registerScore(initials) {
+
+  // 2인 플레이 모드 확인
+  const key = isTwoPlayerMode ? "hallOfFame_2P" : "hallOfFame_1P";
+
   // 기존 기록 로드
-  let hall = JSON.parse(localStorage.getItem("hallOfFame") || "[]");
+  let hall = JSON.parse(localStorage.getItem(key) || "[]");
   // 추가
   hall.push({ name: initials, score });
   // 점수 순으로 정렬 후 상위 10개만 저장 (예시)
   hall = hall.sort((a, b) => b.score - a.score).slice(0, 10);
-  localStorage.setItem("hallOfFame", JSON.stringify(hall));
-  showHallOfFame();
+  localStorage.setItem(key, JSON.stringify(hall)); //기존 "hallOfFame_2P" -> key로 수정"
+  showHallOfFame(isTwoPlayerMode ? "2P" : "1P");
 }
 
 // 실패 시
@@ -1041,13 +1065,18 @@ function formatTime(sec) {
 }
 
 // 명예의 전당 표시
-function showHallOfFame() {
+function showHallOfFame(mode = "1P") {
   $("#main-menu, #difficulty-menu, #game-screen, #register-score-modal").hide();
   $("#hall-of-fame").show();
+
+  const key = mode === "2P" ? "hallOfFame_2P" : "hallOfFame_1P";
   // 데이터 표시
-  let hall = JSON.parse(localStorage.getItem("hallOfFame") || "[]");
+  const hall = JSON.parse(localStorage.getItem(key) || "[]");
   let html = hall
-    .map((r) => `<tr><td>${r.name}</td><td>${r.score}</td></tr>`)
+    .map((r) => {
+      const modeTag = r.mode === "2P" ? " <span style='color:#aaa'>(2P)</span>" : "";
+      return `<tr><td>${r.name}</td><td>${r.score}${modeTag}</td></tr>`;
+    })
     .join("");
   $("#hall-of-fame-table tbody").html(html);
 }
@@ -1086,9 +1115,13 @@ $("#btn-exit").click(function () {
   if (timer) clearInterval(timer);
 });
 
-$("#btn-hall").click(function () {
+/*$("#btn-hall").click(function () {
   showHallOfFame();
 });
+*/
+$("#btn-hall").click(() => showHallOfFame("1P"));
+$("#btn-hall-1p").click(() => showHallOfFame("1P"));
+$("#btn-hall-2p").click(() => showHallOfFame("2P"));
 
 $("#btn-clear-yes").click(function () {
   $("#game-clear-modal").hide();
