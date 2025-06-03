@@ -124,6 +124,7 @@ body {
   font-family: "Pretendard", "Arial", sans-serif;
   min-height: 100vh;
 }
+
 #main-menu {
   display: flex;
   flex-direction: column;
@@ -145,6 +146,11 @@ body {
   text-shadow: 0 0 14px #21f4fa;
   font-weight: 900;
   letter-spacing: 2.5px;
+}
+
+#main-menu h1 span {
+  color: #ff4c4c;
+  text-shadow: 0 0 14px #dc0000;
 }
 
 #main-menu ul {
