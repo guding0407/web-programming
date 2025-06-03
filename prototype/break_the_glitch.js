@@ -141,7 +141,6 @@ function playStartStory() {
 
 // main-menu와 난이도 메뉴 전환
 $("#btn-start").click(function () {
-
   //bgm 에러 수정
   const bgm = localStorage.getItem("setting_bgm");
   if (bgm !== "false") {
@@ -151,7 +150,6 @@ $("#btn-start").click(function () {
   } else {
     bgmAudio.pause();
   }
-
 
   $("#main-menu").hide();
   $("#difficulty-menu").show();
@@ -796,7 +794,7 @@ function initGame(config, level, twoPlayerMode) {
           bonus = timeLeft * 200;
           break;
       }
-      bonus = Math.floor(bonus * bonusMultiplier); // 보정된 보너스
+      bonus = Math.floor(bonus * bonusMultiplier);
       score += bonus;
 
       let clearTime = 300 - timeLeft;
@@ -810,9 +808,9 @@ function initGame(config, level, twoPlayerMode) {
 
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
-      $("#clear-score-text").empty();  // ✅ 먼저 초기화
-      $("#clear-score-text").append(str1+"<br>");
-      $("#clear-score-text").append(str2+"<br>");
+      $("#clear-score-text").empty();
+      $("#clear-score-text").append(str1 + "<br>");
+      $("#clear-score-text").append(str2 + "<br>");
       $("#clear-score-text").append(str3);
       return;
     }
@@ -998,7 +996,7 @@ function loadSettings() {
   const twoPlayer = localStorage.getItem("setting_two_player");
   $("#two-player-toggle").prop("checked", twoPlayer === "true");
 
-/*  if (bgm !== "false") {
+  /*  if (bgm !== "false") {
     bgmAudio.play();
   } else {
     bgmAudio.pause();
@@ -1025,7 +1023,6 @@ $("#btn-clear-no").click(function () {
 
 // 명예의 전당 등록
 function registerScore(initials) {
-
   // 2인 플레이 모드 확인
   const key = isTwoPlayerMode ? "hallOfFame_2P" : "hallOfFame_1P";
 
@@ -1074,7 +1071,8 @@ function showHallOfFame(mode = "1P") {
   const hall = JSON.parse(localStorage.getItem(key) || "[]");
   let html = hall
     .map((r) => {
-      const modeTag = r.mode === "2P" ? " <span style='color:#aaa'>(2P)</span>" : "";
+      const modeTag =
+        r.mode === "2P" ? " <span style='color:#aaa'>(2P)</span>" : "";
       return `<tr><td>${r.name}</td><td>${r.score}${modeTag}</td></tr>`;
     })
     .join("");
