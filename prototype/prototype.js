@@ -811,7 +811,7 @@ function initGame(config, level, twoPlayerMode) {
       // 게임 클리어 모달 띄우기
       $("#game-clear-modal").show();
       $("#clear-score-text").empty();  // ✅ 먼저 초기화
-      $("#clear-score-text").append(str1+" ");
+      $("#clear-score-text").append(str1+"<br>");
       $("#clear-score-text").append(str2+"<br>");
       $("#clear-score-text").append(str3);
       return;
