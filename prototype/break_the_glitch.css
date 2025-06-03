@@ -147,6 +147,11 @@ body {
   letter-spacing: 2.5px;
 }
 
+#main-menu h1 span {
+  color: #ff4c4c;
+  text-shadow: 0 0 14px #dc0000;
+}
+
 #main-menu ul {
   display: flex;
   flex-direction: column;
