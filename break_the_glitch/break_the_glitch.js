@@ -693,7 +693,7 @@ function initGame(config, level, twoPlayerMode) {
 
           // 충돌 후 벽돌 이미지 변경: draw 루프에서 b.hp에 따라 자동 적용됨
 
-          if (itemEnabled && Math.random() < 0.9) {
+          if (itemEnabled && Math.random() < 0.2) {
             // 20% 확률로 아이템 생성
             const types = [
               "paddle-widen",
