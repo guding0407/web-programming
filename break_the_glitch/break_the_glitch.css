@@ -398,6 +398,12 @@ canvas#game-canvas {
   box-shadow: 0 3px 10px #21f4fa55;
 }
 
+#hall-buttons button:focus {
+  color: #232847;
+  background-color: #3df4fa;
+  border: 1px solid #232847;
+}
+
 input#initials-input {
   padding: 10px 20px;
   border-radius: 8px;
