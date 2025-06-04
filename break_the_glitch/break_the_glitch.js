@@ -693,7 +693,7 @@ function initGame(config, level, twoPlayerMode) {
 
           // 충돌 후 벽돌 이미지 변경: draw 루프에서 b.hp에 따라 자동 적용됨
 
-          if (itemEnabled && Math.random() < 0.2) {
+          if (itemEnabled && Math.random() < 0.9) {
             // 20% 확률로 아이템 생성
             const types = [
               "paddle-widen",
@@ -1025,6 +1025,7 @@ $("#btn-clear-no").click(function () {
 function registerScore(initials) {
   // 2인 플레이 모드 확인
   const key = isTwoPlayerMode ? "hallOfFame_2P" : "hallOfFame_1P";
+  const mode = isTwoPlayerMode ? "2P" : "1P"; // 추가된 부분
 
   // 기존 기록 로드
   let hall = JSON.parse(localStorage.getItem(key) || "[]");
@@ -1033,7 +1034,7 @@ function registerScore(initials) {
   // 점수 순으로 정렬 후 상위 10개만 저장 (예시)
   hall = hall.sort((a, b) => b.score - a.score).slice(0, 10);
   localStorage.setItem(key, JSON.stringify(hall)); //기존 "hallOfFame_2P" -> key로 수정"
-  showHallOfFame(isTwoPlayerMode ? "2P" : "1P");
+  showHallOfFame(mode);
 }
 
 // 실패 시
@@ -1044,7 +1045,7 @@ function gameOver(isClear) {
   }
 }
 
-// 일지중단 기능
+// 일시중단 기능
 function pauseGame() {
   isPaused = true;
   cancelAnimationFrame(window.animId);
@@ -1070,12 +1071,9 @@ function showHallOfFame(mode = "1P") {
   // 데이터 표시
   const hall = JSON.parse(localStorage.getItem(key) || "[]");
   let html = hall
-    .map((r) => {
-      const modeTag =
-        r.mode === "2P" ? " <span style='color:#aaa'>(2P)</span>" : "";
-      return `<tr><td>${r.name}</td><td>${r.score}${modeTag}</td></tr>`;
-    })
+    .map((r) => `<tr><td>${r.name}</td><td>${r.score}</td></tr>`)
     .join("");
+
   $("#hall-of-fame-table tbody").html(html);
 }
 
