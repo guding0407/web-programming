@@ -289,7 +289,8 @@ function updateScenarioView() {
 $(".btn-difficulty")
   .off("click")
   .on("click", function () {
-    const level = $(this).data("level"); // 1 · 2 · 3
+    score = 0;
+    level = $(this).data("level"); // 1 · 2 · 3
     switch (level) {
       case 1:
         playStage1Story(level);
@@ -358,6 +359,7 @@ let MAX_BALLS = 3; //공의 최대 개수
 let canvas = null;
 let context = null;
 let isTwoPlayerMode = false;
+let level = 1;
 
 // 게임 화면 효과음은 객체로 관리
 const audioAssets = {
@@ -385,7 +387,6 @@ imageAssets.blocks[2].src = "assets/img/level_3_block_64bit.png";
 function startGame(level) {
   const config = GAME_LEVELS[level];
   isTwoPlayerMode = $("#two-player-toggle").is(":checked"); //2인 플레이 확인
-  score = 0;
   timeLeft = 300;
   lives = 5;
   $("#difficulty-menu, #main-menu, #hall-of-fame").hide();
@@ -797,22 +798,9 @@ function initGame(config, level, twoPlayerMode) {
       bonus = Math.floor(bonus * bonusMultiplier);
       score += bonus;
 
-      let clearTime = 300 - timeLeft;
-      let clearTimeMin = Math.floor(clearTime / 60);
-      let clearTimeSec = Math.floor(clearTime % 60);
-      let timeLeftMin = Math.floor(timeLeft / 60);
-      let timeLeftSec = Math.floor(timeLeft % 60);
-      let str1 = "클리어 시간 : " + clearTimeMin + "분 " + clearTimeSec + "초";
-      let str2 = "남은 시간 : " + timeLeftMin + "분 " + timeLeftSec + "초";
-      let str3 = "최종 점수: " + score + "점";
-
-      // 게임 클리어 모달 띄우기
-      $("#game-clear-modal").show();
-      $("#clear-score-text").empty();
-      $("#clear-score-text").append(str1 + "<br>");
-      $("#clear-score-text").append(str2 + "<br>");
-      $("#clear-score-text").append(str3);
+      goToNextStage();
       return;
+
     }
 
     animId = requestAnimationFrame(draw);
@@ -1012,10 +1000,31 @@ $("#btn-option-back").click(function () {
   $("#main-menu").show();
 });
 
+$("#btn-clear-yes").click(function () {
+  $("#game-clear-modal").hide();
+  $("#register-score-modal").show();
+  $("#initials-input").val("").focus();
+});
+
 // 게임 클리어 시 명예의 전당에 등록하지 않을 때
 $("#btn-clear-no").click(function () {
   // 게임 클리어 모달 숨기고, 메뉴로 복귀 + 게임/타이머 강제 종료
   $("#game-clear-modal, #game-screen, #register-score-modal").hide();
+  $("#main-menu").show();
+  if (window.animId) cancelAnimationFrame(window.animId);
+  if (timer) clearInterval(timer);
+});
+
+$("#btn-over-yes").click(function () {
+  $("#game-over-modal").hide();
+  $("#register-score-modal").show();
+  $("#initials-input").val("").focus();
+});
+
+// 게임 클리어 시 명예의 전당에 등록하지 않을 때
+$("#btn-over-no").click(function () {
+  // 게임 클리어 모달 숨기고, 메뉴로 복귀 + 게임/타이머 강제 종료
+  $("#game-over-modal, #game-screen, #register-score-modal").hide();
   $("#main-menu").show();
   if (window.animId) cancelAnimationFrame(window.animId);
   if (timer) clearInterval(timer);
@@ -1041,7 +1050,10 @@ function registerScore(initials) {
 function gameOver(isClear) {
   if (!isClear) {
     // 게임 종료 안내, 메뉴로 복귀 버튼 노출
+    let str = "최종 점수: " + score + "점";
     $("#game-over-modal").show();
+    $("#clear-score-text").empty();
+    $("#clear-score-text").append(str);
   }
 }
 
@@ -1119,11 +1131,6 @@ $("#btn-hall").click(() => showHallOfFame("1P"));
 $("#btn-hall-1p").click(() => showHallOfFame("1P"));
 $("#btn-hall-2p").click(() => showHallOfFame("2P"));
 
-$("#btn-clear-yes").click(function () {
-  $("#game-clear-modal").hide();
-  $("#register-score-modal").show();
-  $("#initials-input").val("").focus();
-});
 
 $("#btn-register-score")
   .off("click")
@@ -1145,3 +1152,39 @@ $("#btn-register-score")
     $("#initials-input").val("");
     $("#register-score-modal").hide();
   });
+
+// 다음 단계 진입
+function goToNextStage() {
+  if (level === 1) {
+    level = 2;
+    playStage2Story(2);
+  } else if (level === 2) {
+    level = 3;
+    playStage3Story(3);
+  } else {
+    showRegisterScoreModal(); // stage3 클리어
+  }
+}
+
+function showRegisterScoreModal() {
+  let clearTime = 300 - timeLeft;
+  let clearTimeMin = Math.floor(clearTime / 60);
+  let clearTimeSec = Math.floor(clearTime % 60);
+  let timeLeftMin = Math.floor(timeLeft / 60);
+  let timeLeftSec = Math.floor(timeLeft % 60);
+  let str1 = "클리어 시간 : " + clearTimeMin + "분 " + clearTimeSec + "초";
+  let str2 = "남은 시간 : " + timeLeftMin + "분 " + timeLeftSec + "초";
+  let str3 = "최종 점수: " + score + "점";
+
+  // 게임 클리어 모달 띄우기
+  $("#game-clear-modal").show();
+  $("#clear-score-text").empty();
+  $("#clear-score-text").append(str1 + "<br>");
+  $("#clear-score-text").append(str2 + "<br>");
+  $("#clear-score-text").append(str3);
+}
+
+function showStageClearModal() {
+  $("#game-clear-modal").show();
+  $("#clear-score-text").html("현재 점수: " + score + "점<br>다음 단계로 진행하시겠습니까?");
+}
