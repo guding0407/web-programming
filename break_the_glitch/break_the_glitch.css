@@ -549,7 +549,9 @@ input#initials-input {
   text-align: center;
 }
 #btn-clear-yes,
-#btn-clear-no {
+#btn-clear-no,
+#btn-over-yes,
+#btn-over-no {
   background: #ff68ba;
   border: 2px solid #c542ff;
   color: #fff;
