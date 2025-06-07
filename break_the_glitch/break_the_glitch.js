@@ -800,7 +800,6 @@ function initGame(config, level, twoPlayerMode) {
 
       goToNextStage();
       return;
-
     }
 
     animId = requestAnimationFrame(draw);
@@ -1131,7 +1130,6 @@ $("#btn-hall").click(() => showHallOfFame("1P"));
 $("#btn-hall-1p").click(() => showHallOfFame("1P"));
 $("#btn-hall-2p").click(() => showHallOfFame("2P"));
 
-
 $("#btn-register-score")
   .off("click")
   .on("click", function () {
@@ -1186,5 +1184,7 @@ function showRegisterScoreModal() {
 
 function showStageClearModal() {
   $("#game-clear-modal").show();
-  $("#clear-score-text").html("현재 점수: " + score + "점<br>다음 단계로 진행하시겠습니까?");
+  $("#clear-score-text").html(
+    "현재 점수: " + score + "점<br>다음 단계로 진행하시겠습니까?"
+  );
 }
