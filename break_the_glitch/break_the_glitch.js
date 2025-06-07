@@ -236,7 +236,7 @@ const STAGE3_STORY_SCENES = [
     img: "assets/img/scenario_level3/scene2.png",
     text:
       "<strong style='color:#ff3a4a'>GLITCH CORE</strong>가 <span style='color:#ff3a4a'>Self-Repair Loop</span> 가동 중!<br>" +
-      "도시 전체 잠식까지 <span style='color:#ffe062'>00 : 59</span>",
+      "도시 전체 잠식까지 <span style='color:#ffe062'>04 : 59</span>",
   },
   {
     img: "assets/img/scenario_level3/scene3.png",
