@@ -540,6 +540,7 @@ input#initials-input {
   text-align: center;
   text-shadow: 0 0 10px #fd0;
 }
+#over-score-text,
 #clear-score-text {
   color: #3df4fa;
   font-size: 1.45rem;
