@@ -360,6 +360,7 @@ let canvas = null;
 let context = null;
 let isTwoPlayerMode = false;
 let level = 1;
+let isGameOver = false;
 
 // 게임 화면 효과음은 객체로 관리
 const audioAssets = {
@@ -389,6 +390,8 @@ function startGame(level) {
   isTwoPlayerMode = $("#two-player-toggle").is(":checked"); //2인 플레이 확인
   timeLeft = 300;
   lives = 5;
+  isGameOver = false;
+
   $("#difficulty-menu, #main-menu, #hall-of-fame").hide();
   $("#game-screen").show();
   $("#lives").remove(); // 이전 표시 제거
@@ -525,6 +528,8 @@ function initGame(config, level, twoPlayerMode) {
 
   // 게임 루프
   window.draw = function () {
+    if (isPaused || isGameOver) return;  // ← 게임 오버 시 바로 종료
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (isPaused) return;
 
@@ -1042,11 +1047,22 @@ function registerScore(initials) {
 // 실패 시
 function gameOver(isClear) {
   if (!isClear) {
+    isGameOver = true;  // 게임 오버 플래그 설정
+
+    if (window.animId) cancelAnimationFrame(window.animId);
+    if (timer) clearInterval(timer);
+
+    // 패들 조작 차단
+    $(document).off("keydown keyup");
+
+
     // 게임 종료 안내, 메뉴로 복귀 버튼 노출
     let str = "최종 점수: " + score + "점";
     $("#game-over-modal").show();
-    $("#clear-score-text").empty();
-    $("#clear-score-text").append(str);
+
+    $("#over-score-text").empty();
+    $("#over-score-text").append(str);
+
   }
 }
 
