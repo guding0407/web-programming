@@ -1183,8 +1183,3 @@ function showRegisterScoreModal() {
   $("#clear-score-text").append(str2 + "<br>");
   $("#clear-score-text").append(str3);
 }
-
-function showStageClearModal() {
-  $("#game-clear-modal").show();
-  $("#clear-score-text").html("현재 점수: " + score + "점<br>다음 단계로 진행하시겠습니까?");
-}
