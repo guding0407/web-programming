@@ -239,7 +239,7 @@ const STAGE3_STORY_SCENES = [
     img: "assets/img/scenario_level3/scene2.png",
     text:
       "<strong style='color:#ff3a4a'>GLITCH CORE</strong>가 <span style='color:#ff3a4a'>Self-Repair Loop</span> 가동 중!<br>" +
-      "도시 전체 잠식까지 <span style='color:#ffe062'>00 : 59</span>",
+      "도시 전체 잠식까지 <span style='color:#ffe062'>04 : 59</span>",
   },
   {
     img: "assets/img/scenario_level3/scene3.png",
@@ -803,7 +803,6 @@ function initGame(config, level, twoPlayerMode) {
 
       goToNextStage();
       return;
-
     }
 
     animId = requestAnimationFrame(draw);
@@ -1144,7 +1143,6 @@ $("#btn-hall").click(() => showHallOfFame("1P"));
 $("#btn-hall-1p").click(() => showHallOfFame("1P"));
 $("#btn-hall-2p").click(() => showHallOfFame("2P"));
 
-
 $("#btn-register-score")
   .off("click")
   .on("click", function () {
@@ -1195,4 +1193,11 @@ function showRegisterScoreModal() {
   $("#clear-score-text").append(str1 + "<br>");
   $("#clear-score-text").append(str2 + "<br>");
   $("#clear-score-text").append(str3);
+}
+
+function showStageClearModal() {
+  $("#game-clear-modal").show();
+  $("#clear-score-text").html(
+    "현재 점수: " + score + "점<br>다음 단계로 진행하시겠습니까?"
+  );
 }
