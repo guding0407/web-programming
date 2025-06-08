@@ -1052,8 +1052,8 @@ function gameOver(isClear) {
     // 게임 종료 안내, 메뉴로 복귀 버튼 노출
     let str = "최종 점수: " + score + "점";
     $("#game-over-modal").show();
-    $("#clear-score-text").empty();
-    $("#clear-score-text").append(str);
+    $("#over-score-text").empty();
+    $("#over-score-text").append(str);
   }
 }
 
