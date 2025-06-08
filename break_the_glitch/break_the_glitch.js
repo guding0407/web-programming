@@ -390,6 +390,8 @@ function startGame(level) {
   isTwoPlayerMode = $("#two-player-toggle").is(":checked"); //2인 플레이 확인
   timeLeft = 300;
   lives = 5;
+  isGameOver = false;
+
   $("#difficulty-menu, #main-menu, #hall-of-fame").hide();
   $("#game-screen").show();
   $("#lives").remove(); // 이전 표시 제거
@@ -527,7 +529,7 @@ function initGame(config, level, twoPlayerMode) {
   // 게임 루프
   window.draw = function () {
     if (isPaused || isGameOver) return;  // ← 게임 오버 시 바로 종료
-    
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     if (isPaused) return;
 
