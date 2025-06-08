@@ -11,14 +11,12 @@ bgmAsset.loop = true;
 bgmAudio = bgmAsset; // 기본 배경음악 설정
 bgmAudio.volume = volume; // 초기 볼륨 설정
 
-function renderNumberWithImages(number, container) {
-  // container: DOM 요소 객체 또는 id 문자열 둘 다 허용
-  const elem = typeof container === "string" ? document.getElementById(container) : container;
-  if (!elem) return;
+//번호 이미지로 표기 함수
+function renderNumberWithImages(number, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
 
-  elem.innerHTML = ""; // 비우고 시작
   const str = number.toString();
-
   for (let i = 0; i < str.length; i++) {
     const digit = str[i];
     if (digit >= "0" && digit <= "9") {
@@ -26,11 +24,10 @@ function renderNumberWithImages(number, container) {
       img.src = `assets/img/${digit}_8bit.png`;
       img.className = "digit-img";
       img.alt = digit;
-      elem.appendChild(img);
+      container.appendChild(img);
     }
   }
 }
-
 
 function renderTimeWithImages(sec, containerId) {
   const m = Math.floor(sec / 60)
@@ -723,11 +720,11 @@ function initGame(config, level, twoPlayerMode) {
       // 아이템 이동
       item.y += item.dy;
 
-      /*  바닥 아래로 내려갔다면 비활성화
+      //  바닥 아래로 내려갔다면 비활성화
       if (item.y > canvas.height) {
         item.active = false;
         continue;
-      }*/
+      }
 
       // 그리기
       if (item.type === "ball-count-up") {
@@ -885,7 +882,7 @@ function applyEffect(paddle, type, duration) {
     }
   }
 
-  // 3) 메타데이터 업데이트
+  // 3) 효과 지속시간 업데이트
   paddle.effect = type;
   paddle.effectTimeout = setTimeout(() => {
     if (paddle.revertFn) paddle.revertFn();
@@ -986,12 +983,6 @@ function loadSettings() {
   const twoPlayer = localStorage.getItem("setting_two_player");
   $("#two-player-toggle").prop("checked", twoPlayer === "true");
 
-  /*  if (bgm !== "false") {
-    bgmAudio.play();
-  } else {
-    bgmAudio.pause();
-  }*/
-
   sfxEnabled = sfx !== "false";
   itemEnabled = item !== "false";
 }
@@ -1054,8 +1045,8 @@ function gameOver(isClear) {
     // 게임 종료 안내, 메뉴로 복귀 버튼 노출
     let str = "최종 점수: " + score + "점";
     $("#game-over-modal").show();
-    $("#over-score-text").empty();
-    $("#over-score-text").append(str);
+    $("#clear-score-text").empty();
+    $("#clear-score-text").append(str);
   }
 }
 
@@ -1076,29 +1067,19 @@ function formatTime(sec) {
   return `${m}:${s}`;
 }
 
+// 명예의 전당 표시
 function showHallOfFame(mode = "1P") {
   $("#main-menu, #difficulty-menu, #game-screen, #register-score-modal").hide();
   $("#hall-of-fame").show();
 
   const key = mode === "2P" ? "hallOfFame_2P" : "hallOfFame_1P";
+  // 데이터 표시
   const hall = JSON.parse(localStorage.getItem(key) || "[]");
+  let html = hall
+    .map((r) => `<tr><td>${r.name}</td><td>${r.score}</td></tr>`)
+    .join("");
 
-  const $tbody = $("#hall-of-fame-table tbody");
-  $tbody.empty(); // 기존 내용 삭제
-
-  hall.forEach((r) => {
-    const $row = $("<tr></tr>");
-    const $nameTd = $("<td></td>").text(r.name);
-    const $scoreTd = $("<td></td>");
-    const $scoreDiv = $("<div></div>").addClass("score-img-container");
-
-    // 점수를 이미지로 출력
-    renderNumberWithImages(r.score, $scoreDiv[0]);
-
-    $scoreTd.append($scoreDiv);
-    $row.append($nameTd).append($scoreTd);
-    $tbody.append($row);
-  });
+  $("#hall-of-fame-table tbody").html(html);
 }
 
 // 게임오버/명예의전당에서 메뉴로 복귀
